@@ -23,6 +23,11 @@ public partial class Singleton<TSelf> : Node where TSelf : class
     protected virtual bool _LoadFromResource() => false;
 }
 
+public partial class DataSingleton : Singleton<TSelf> where TSelf : class
+{
+}
+
+
 public class RawSingleton<TSelf> where TSelf : class, new()
 {
     private static TSelf _instance = null!;

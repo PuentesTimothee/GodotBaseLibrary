@@ -84,7 +84,7 @@ public partial class GameSettings : Datas.Singleton<GameSettings>
         return false;
     }
     
-    public void _InitOptions()
+    public virtual void _InitOptions()
     {
         _AddSettingFromTag(GameSettings_Tags.Game_Locale, new GameSingleSettings_Locale());
         
