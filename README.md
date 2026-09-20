@@ -61,6 +61,33 @@ The repository make a plugin that need enabling in your project settings. Useabl
 ## Settings
   
   - GameSettings
-    - Use to represent  
+    - *Inheritable* -> Override *_InitOptions* and call *_AddSettingFromTag* to add your own options
+    - Use to Load&Save option in a XML  
+
+  - GameSingleSetting
+    - *Inheritable*
+    - Use this class or one of it's parent to implement your custom settings
+
+## UI
+
+  -  **CW_Control**
+    - The parent of most widgets
+
+  - **CW_MenuManger**
+    - Root of all menu
+    - Make a scene out of it and add all of your menu With the associate **Tag**
+   
+  - **CW_Activatable**
+    - Represent part of the UI that can be toggle On/Off Like a menu, a dropdown, a "More Details part"
+  - **CW_MenuContainer**
+    - Represent a menu
+
+  - **CW_ListObjectContainer**
+    - Represent any list with Data, you can init the list with any singular or list of **Godot.Object**
+  - **CW_Header**
+    - Header of menu for Menu title/CloseControl/Anything your heart desire.
+  - **CW_Footer**
+    - Display all active Shortcut & Action
 
 ## Helpers
+  See the files for all functions
