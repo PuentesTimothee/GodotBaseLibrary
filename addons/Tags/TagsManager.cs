@@ -49,21 +49,21 @@ public partial class TagsManager : BaseGameLibrary.Datas.Singleton<TagsManager>
 
 	public TagNode? GetLinkedNode(Tag p_tag)
 	{
-		Debug.Assert(_RootNode is null, nameof(TagsManager._RootNode) + $" is null. TagManager.GetLinkedNode(${p_tag._StringTag})");
+		Debug.Assert(_RootNode is not null, nameof(TagsManager._RootNode) + $" is null. TagManager.GetLinkedNode(${p_tag._StringTag})");
 		string[] sStrings = p_tag._StringTag.ToString().Split('.');
 		return _RootNode!.FindLinkedNode(sStrings, 0);
 	}
 	
 	public bool Contains(StringName p_tag)
 	{
-		Debug.Assert(_RootNode is null, nameof(TagsManager._RootNode) + $" is null. TagManager.Contains(${p_tag})");
+		Debug.Assert(_RootNode is not null, nameof(TagsManager._RootNode) + $" is null. TagManager.Contains(${p_tag})");
 		string[] sStrings = p_tag.ToString().Split('.');
 		return _RootNode!.FindLinkedNode(sStrings, 0) is not null;
 	}
 
 	public bool Add(StringName p_tag)
 	{
-		Debug.Assert(_RootNode is null, nameof(TagsManager._RootNode) + $" is null. TagManager.Add(${p_tag})");
+		Debug.Assert(_RootNode is not null, nameof(TagsManager._RootNode) + $" is null. TagManager.Add(${p_tag})");
 		
 		if (!OS.HasFeature("editor"))
 			_LoadedTags.Add(p_tag.ToString());
