@@ -5,7 +5,7 @@ using System;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary.Tags.editor;
+namespace ElementGodot.Tags.editor;
 
 [Tool]
 public partial class QueryExpressionEditorControl : VBoxContainer
@@ -197,7 +197,7 @@ public partial class QueryExpressionEditorControl : VBoxContainer
 		if (_query is null || _contentContainer is null)
 			return;
 		
-		TagContainerSelectionControl tagContainerEditor = new();
+		TagContainerInspectorControl tagContainerEditor = new();
 		tagContainerEditor.SetValue(_query._Tags);
 		tagContainerEditor.On_ValueChanged += OnTagContainerChanged;
 		_contentContainer.AddChild(QueryExpressionEditorControl.CreateLabeledRow("Tags:", tagContainerEditor));

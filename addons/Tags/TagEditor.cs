@@ -1,8 +1,8 @@
 #if TOOLS
-using ElementGodot.BaseGameLibrary.Tags.editor;
+using ElementGodot.Tags.editor;
 using Godot;
 
-namespace ElementGodot.BaseGameLibrary.Tags;
+namespace ElementGodot.Tags;
 
 [Tool]
 public partial class TagEditor : EditorPlugin
@@ -31,10 +31,13 @@ public partial class TagEditor : EditorPlugin
 		
 		_tagsEditorDock = new TagsEditorDock();
 		AddDock(_tagsEditorDock);
+		
 		_tagContainerInspectorPlugin = new TagContainerInspectorPlugin();
 		AddInspectorPlugin(_tagContainerInspectorPlugin);
+		
 		_queryExpressionInspectorPlugin = new QueryExpressionInspectorPlugin();
 		AddInspectorPlugin(_queryExpressionInspectorPlugin);
+		
 		_tagInspectorPlugin = new TagInspectorPlugin();
 		AddInspectorPlugin(_tagInspectorPlugin);
 

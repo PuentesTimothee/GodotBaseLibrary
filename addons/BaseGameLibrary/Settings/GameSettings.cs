@@ -1,6 +1,6 @@
 ﻿using ElementGodot.BaseGameLibrary.Datas;
 using ElementGodot.BaseGameLibrary.Helpers;
-using ElementGodot.BaseGameLibrary.Tags;
+using ElementGodot.Tags;
 using Godot;
 using Godot.Collections;
 
@@ -36,14 +36,14 @@ public class GameSettings_Tags
 [GlobalClass]
 public partial class GameSettings : Datas.Singleton<GameSettings>
 {
-    public Godot.Collections.Dictionary<StringName, GameSingleSetting> _Values = new ();
+    public Dictionary<StringName, GameSingleSetting> _Values = new ();
     
     protected const string FULL_PATH_DATA = SingletonHelper.PATH_DATA + "/BaseSettings.json";
 
-    public TType? GetSetting<TType>(Tag p_tag) where TType : Resource => _Values[p_tag._StringTag] as TType;
+    public TType? GetSetting<TType>(Tag p_tag) where TType : Resource => _Values[p_tag.FullName()] as TType;
     public TType? GetSettingValue<TType>(Tag p_tag)
         {
-            if (_Values[p_tag._StringTag] is GameSingleSetting_Specific<TType> sVal)
+            if (_Values[p_tag.FullName()] is GameSingleSetting_Specific<TType> sVal)
                 return sVal.GetValue();
             return default;
         }
@@ -53,11 +53,13 @@ public partial class GameSettings : Datas.Singleton<GameSettings>
         GameSettings_Tags.Init();
         
         _InitOptions();
+        _SaveToJson();
     }
     
 
     protected override bool _LoadFromJson()
     {
+        GameSettings_Tags.Init();
         foreach (var (_, section) in _Values)
             section.LoadValueFromState();
         
@@ -92,8 +94,13 @@ public partial class GameSettings : Datas.Singleton<GameSettings>
         _AddSettingFromTag(GameSettings_Tags.Graphical_DisplayType, new GameSingleSettings_DisplayType());
         _AddSettingFromTag(GameSettings_Tags.Graphical_VSync, new GameSingleSettings_VSync());
     }
+
+    protected void _AddSettingFromTag(Tag p_sTag, GameSingleSetting p_resource)
+    {
+        if (p_sTag.IsValid())
+            _Values.Add(p_sTag.FullName(), p_resource);
+    }
     
-    protected void _AddSettingFromTag(Tag p_sTag, GameSingleSetting p_resource) => _Values.Add(p_sTag._StringTag, p_resource);
     protected void _AddSettingFromString(StringName p_name, GameSingleSetting p_resource) => _AddSettingFromTag(Tag.RequestTag(p_name, ETagFetch.e_CreateOnError), p_resource);
 }
 

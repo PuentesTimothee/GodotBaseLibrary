@@ -1,7 +1,7 @@
 // Copyright © Gamesmiths Guild.
 
 #if TOOLS
-namespace ElementGodot.BaseGameLibrary.Tags.editor;
+namespace ElementGodot.Tags.editor;
 
 internal static class EditorUtils
 {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Godot;
-using Tag = ElementGodot.BaseGameLibrary.Tags.Tag;
+using Tag = ElementGodot.Tags.Tag;
 
 namespace ElementGodot.BaseGameLibrary.Helpers;
 
@@ -77,8 +77,8 @@ public static class TimHelpers
 	public static bool _WriteJson(string p_jsonFilePath, Variant p_sData)
 	{
 		if (FileAccess.Open(p_jsonFilePath, FileAccess.ModeFlags.Write) is { } file)
-		{	
-			if (!file.StoreString(Json.Stringify(p_sData)))
+		{
+			if (!file.StoreString(Json.Stringify(p_sData, " ")))
 			{
 				MyLogger._LogErrorCommon($"TimHelpers: Write JSon [${p_jsonFilePath}]: Writing Failed");
 				file.Close();

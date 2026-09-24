@@ -4,16 +4,16 @@
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary.Tags.editor;
+namespace ElementGodot.Tags.editor;
 
 [Tool]
 public partial class TagContainerEditorProperty : EditorProperty, ISerializationListener
 {
-	private TagContainerSelectionControl? _editor;
+	private TagContainerInspectorControl? _editor;
 
 	public override void _Ready()
 	{
-		_editor = new TagContainerSelectionControl();
+		_editor = new TagContainerInspectorControl();
 		_editor.On_ValueChanged += OnValueChanged;
 		AddChild(_editor);
 		SetBottomEditor(_editor);

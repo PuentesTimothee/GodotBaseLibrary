@@ -38,7 +38,7 @@ public partial class CW_Header : MarginContainer
         _Owner = p_owner;
         
         if (_Owner._Header is not null && _Owner._Header != this)
-            throw new InvalidDataException($"Duplicate Header for menu {_Owner._LinkedTag}");
+            throw new InvalidDataException($"Duplicate Header for menu {_Owner._Tag}");
 
         _Owner._Header = this;
         _MenuName?.SetText(p_owner._MenuName);

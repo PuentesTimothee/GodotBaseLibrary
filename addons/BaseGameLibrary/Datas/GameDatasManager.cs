@@ -4,7 +4,7 @@ using Godot.Collections;
 namespace ElementGodot.BaseGameLibrary.Datas;
 
 //Fill it with all your singleton that you wish initialized on startup
-public sealed partial class GameDatasManager : Singleton<GameDatasManager>
+public partial class GameDatasManager : Singleton<GameDatasManager>
 {
     private Array<Node> m_AllManager = new Array<Node>();
 

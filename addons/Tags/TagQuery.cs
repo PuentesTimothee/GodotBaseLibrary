@@ -1,7 +1,8 @@
-﻿using Godot;
+﻿using System.Linq.Expressions;
+using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary.Tags;
+namespace ElementGodot.Tags;
 
 public enum EQueryType
 {
@@ -14,10 +15,15 @@ public enum EQueryType
     e_NoMatchExpression
 }
 
+[Tool]
+[GlobalClass]
 public partial class TagQuery : Resource
 {
+    [Export]
     public EQueryType _QueryType = EQueryType.e_Undefined;
+    [Export]
     public TagContainer _Tags;
+    [Export]
     public Array<TagQuery> _Expressions;
 
     public TagQuery()
@@ -114,5 +120,16 @@ public partial class TagQuery : Resource
         }
                         
         return false;
+    }
+    
+    public override void _ValidateProperty(Dictionary p_property)
+    {
+        if ((_QueryType == EQueryType.e_Undefined || IsExpression())
+            && p_property["name"].AsStringName() == PropertyName._Tags)
+            p_property["usage"] = (int)PropertyUsageFlags.NoEditor;
+
+        if ((_QueryType == EQueryType.e_Undefined || !IsExpression())
+            && p_property["name"].AsStringName() == PropertyName._Tags)
+            p_property["usage"] = (int)PropertyUsageFlags.NoEditor;
     }
 }

@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Godot;
 
-namespace ElementGodot.BaseGameLibrary.Tags.editor;
+namespace ElementGodot.Tags.editor;
 
 /// <summary>
 /// Editor dock for managing gameplay tags.
@@ -38,8 +38,8 @@ public partial class TagsEditorDock : EditorDock, ISerializationListener
 	{
 		base._Ready();
 
-		_tagsManager = new TagsManager();
-		GetTree().Root.AddChild(_tagsManager);
+		_tagsManager = TagsManager.Instance;
+		//GetTree().Root.AddChild(_tagsManager);
 
 		_addIcon = EditorInterface.Singleton.GetEditorTheme().GetIcon("Add", "EditorIcons");
 		_removeIcon = EditorInterface.Singleton.GetEditorTheme().GetIcon("Remove", "EditorIcons");
@@ -69,7 +69,7 @@ public partial class TagsEditorDock : EditorDock, ISerializationListener
 		if (_addTagButton is not null)
 			_addTagButton.Pressed += AddTagButton_Pressed;
 
-		_tagsManager = TagsManager.Instance;
+		_tagsManager = ElementGodot.Tags.TagsManager.Instance;
 		ReconstructTreeNode();
 	}
 
@@ -161,6 +161,12 @@ public partial class TagsEditorDock : EditorDock, ISerializationListener
 		TreeItem rootTreeNode = _tree.CreateItem();
 		_tree.HideRoot = true;
 
+		if (_tagsManager is null)
+		{
+			_tagsManager = new ElementGodot.Tags.TagsManager();
+			GetTree().Root.AddChild(_tagsManager);
+		}
+
 		if (_tagsManager._RootNode!._Childs.Count == 0)
 		{
 			TreeItem childTreeNode = _tree.CreateItem(rootTreeNode);
@@ -195,7 +201,7 @@ public partial class TagsEditorDock : EditorDock, ISerializationListener
 		{
 			if (p_id == 0)
 			{
-				_tagNameTextField.Text = $"{_treeItemToNode[p_item]._CompleteTagKey}.";
+				_tagNameTextField.Text = $"{_treeItemToNode[p_item]._TagKey}.";
 				_tagNameTextField.GrabFocus();
 				_tagNameTextField.CaretColumn = _tagNameTextField.Text.Length;
 			}
@@ -205,14 +211,14 @@ public partial class TagsEditorDock : EditorDock, ISerializationListener
 				TagNode selectedTag = _treeItemToNode[p_item];
 				foreach (string tag in _tagsManager._LoadedTags)
 				{
-					if (string.Equals(tag, selectedTag._CompleteTagKey, StringComparison.OrdinalIgnoreCase) ||
-						tag.StartsWith(selectedTag._CompleteTagKey + ".", StringComparison.InvariantCultureIgnoreCase))
+					if (string.Equals(tag, selectedTag._TagKey, StringComparison.OrdinalIgnoreCase) ||
+						tag.StartsWith(selectedTag._TagKey + ".", StringComparison.InvariantCultureIgnoreCase))
 						_tagsManager._LoadedTags.Remove(tag);
 				}
 
 				if (selectedTag._ParentTagNode is not null
-					&& !_tagsManager.Contains(selectedTag._ParentTagNode._CompleteTagKey))
-					_tagsManager.Add(selectedTag._ParentTagNode._CompleteTagKey);
+					&& !_tagsManager.Contains(selectedTag._ParentTagNode._TagKey))
+					_tagsManager.Add(selectedTag._ParentTagNode._TagKey);
 
 				_tagsManager._SaveCurrentTags();
 				ReconstructTreeNode();

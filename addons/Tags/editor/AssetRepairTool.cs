@@ -4,17 +4,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ElementGodot.BaseGameLibrary.Helpers;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary.Tags.editor;
+namespace ElementGodot.Tags.editor;
 
 [Tool]
 public partial class AssetRepairTool : EditorPlugin
 {
 	public static void RepairAllAssetsTags()
 	{
-		var tagsManager = TagsManager.Instance;
+		var tagsManager = ElementGodot.Tags.TagsManager.Instance;
 
 		List<string> scenes = AssetRepairTool.GetScenePaths("res://");
 		GD.Print($"Found {scenes.Count} scene(s) to process.");
@@ -117,7 +118,7 @@ public partial class AssetRepairTool : EditorPlugin
 	/// <param name="p_node">Current node iteration.</param>
 	/// <param name="p_tagsManager">The tags manager used to validate tags.</param>
 	/// <returns><see langword="true"/> if any ForgeEntity was modified.</returns>
-	private static bool ProcessNode(Node p_node, TagsManager p_tagsManager)
+	private static bool ProcessNode(Node p_node, ElementGodot.Tags.TagsManager p_tagsManager)
 	{
 		bool modified = AssetRepairTool.ValidateNode(p_node, p_tagsManager);
 
@@ -129,7 +130,7 @@ public partial class AssetRepairTool : EditorPlugin
 		return modified;
 	}
 
-	private static bool ValidateNode(Node p_node, TagsManager p_tagsManager)
+	private static bool ValidateNode(Node p_node, ElementGodot.Tags.TagsManager p_tagsManager)
 	{
 		bool modified = false;
 		foreach (Dictionary propertyInfo in p_node.GetPropertyList())
@@ -157,7 +158,7 @@ public partial class AssetRepairTool : EditorPlugin
 				continue;
 			}
 
-			if (value.As<Resource>() is TagContainer tagContainer)
+			if (value.As<Resource>() is TagContainerResource tagContainer)
 			{
 				modified |= AssetRepairTool.ValidateTagContainerProperty(tagContainer, p_node.Name, p_tagsManager);
 			}
@@ -167,22 +168,25 @@ public partial class AssetRepairTool : EditorPlugin
 	}
 
 	private static bool ValidateTagContainerProperty(
-		TagContainer p_container,
+		TagContainerResource p_container,
 		string p_nodeName,
 		TagsManager p_tagsManager)
 	{
-		HashSet<Tag> originalTags = p_container._Tags;
-		var newTags = new HashSet<Tag>();
+		if (p_container._Tags._IsEmpty())
+			return false;
+		
+		Array<StringName> originalTags = p_container._Tags;
+		Array<StringName> newTags = new();
 		bool modified = false;
 
-		foreach (Tag tag in originalTags)
+		foreach (StringName tag in originalTags)
 		{
 			try
 			{
-				Tag.RequestTag(tag._StringTag, ETagFetch.e_ThrowOnError);
+				Tag.RequestTag(tag, ETagFetch.e_ThrowOnError);
 				newTags.Add(tag);
 			}
-			catch (Exception)
+			catch (TagNotRegisteredException)
 			{
 				GD.PrintRich(
 					$"[color=LIGHT_STEEL_BLUE][RepairTool] Removing invalid tag [{tag}] from node {p_nodeName}.");
@@ -193,7 +197,7 @@ public partial class AssetRepairTool : EditorPlugin
 		if (modified)
 		{
 			p_container._Tags.Clear();
-			foreach (Tag tag in newTags)
+			foreach (StringName tag in newTags)
 				p_container._Tags.Add(tag);
 		}
 

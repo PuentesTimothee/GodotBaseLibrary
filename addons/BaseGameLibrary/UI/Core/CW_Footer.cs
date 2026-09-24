@@ -31,7 +31,7 @@ public partial class CW_Footer : MarginContainer
         _Owner = p_owner;
 
         if (_Owner._Footer is not null && _Owner._Footer != this)
-            throw new InvalidDataException($"Duplicate Footer for menu {_Owner._LinkedTag}");
+            throw new InvalidDataException($"Duplicate Footer for menu {_Owner._Tag}");
         _Owner._Footer = this;
     }
 }

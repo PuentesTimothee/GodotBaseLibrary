@@ -11,9 +11,9 @@ namespace ElementGodot.BaseGameLibrary;
 
 public partial class MainSceneBase : Node3D
 {
-	protected static MainSceneBase? _HiddenInstance = null;
+	protected static MainSceneBase? HiddenInstance = null;
 	
-	protected GameModeBase? _internalGameMode = null;
+	protected GameModeBase? _InternalGameMode = null;
 
 	[Export] protected Camera3D? _InternalCamera3D = null;
 	protected BaseInputNode _InputNode { get; set; }
@@ -23,13 +23,12 @@ public partial class MainSceneBase : Node3D
 
 	public static RandomNumberGenerator RandomNumberGenerator = null!;
 
-	public static BaseInputNode InputNode => MainSceneBase._HiddenInstance?._InputNode!;
-	public static CW_MenuManager MenuManager => MainSceneBase._HiddenInstance?._InternalMenusManager!;
-	public static GameModeBase GetNakedMode() => MainSceneBase._HiddenInstance?._internalGameMode!;
+	public static BaseInputNode InputNode => MainSceneBase.HiddenInstance?._InputNode!;
+	public static CW_MenuManager MenuManager => MainSceneBase.HiddenInstance?._InternalMenusManager!;
+	public static GameModeBase GetNakedMode() => MainSceneBase.HiddenInstance?._InternalGameMode!;
 	protected static TGamemode? Private_GetModeCanFail<TGamemode>() where TGamemode : GameModeBase => MainSceneBase.GetNakedMode() as TGamemode;
 	protected static TGamemode Private_GetMode<TGamemode>() where TGamemode : GameModeBase => MainSceneBase.Private_GetModeCanFail<TGamemode>() ?? throw new InvalidDataException($"No gamemode found {nameof(TGamemode)}.");
 
-	public static bool IsDebugMode = true;
 	public static bool IsTestMode = true;
 	
 	// Warn users if the value hasn't been set.
@@ -46,12 +45,11 @@ public partial class MainSceneBase : Node3D
 	
 	public MainSceneBase()
 	{
-		MainSceneBase._HiddenInstance = this;
+		MainSceneBase.HiddenInstance = this;
 		MainSceneBase.RandomNumberGenerator = new RandomNumberGenerator();
 		
-		var args = new Array<string>(OS.GetCmdlineArgs());
-		MainSceneBase.IsDebugMode = args.Contains("--debug");
-		MainSceneBase.IsTestMode = args.Contains("--game");
+		var args = new Array<string>(OS.GetCmdlineUserArgs());
+		MainSceneBase.IsTestMode = args.Contains("--testMode");
 
 		Dictionary<string, LogType> sValueString = new();
 		string sSeedString = "--seed=";
@@ -82,8 +80,8 @@ public partial class MainSceneBase : Node3D
 		_InternalMenusManager = _MenuManagerPacked?.Instantiate<CW_MenuManager>() ?? throw new InvalidOperationException($"No MenuManager found.");
 		AddChild(_InternalMenusManager);
 
-		_internalGameMode?._GameModeBegin();
-		_internalGameMode?._FinishedLoading();
+		_InternalGameMode?._GameModeBegin();
+		_InternalGameMode?._FinishedLoading();
 	}
 
 	public override void _ExitTree()

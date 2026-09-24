@@ -3,20 +3,12 @@
 #if TOOLS
 using Godot;
 
-namespace ElementGodot.BaseGameLibrary.Tags.editor;
+namespace ElementGodot.Tags.editor;
 
 [Tool]
 public partial class TagInspectorPlugin : EditorInspectorPlugin
 {
-	public override bool _CanHandle(GodotObject p_object)
-	{
-		if (p_object is Tag a)
-			return true;
-
-		if (p_object is Tag)
-			return true;
-		return p_object is Tag;
-	}
+	public override bool _CanHandle(GodotObject p_object) => p_object is Tag;
 
 	public override bool _ParseProperty(
 		GodotObject p_object,
@@ -27,9 +19,6 @@ public partial class TagInspectorPlugin : EditorInspectorPlugin
 		PropertyUsageFlags p_usageFlags,
 		bool p_wide)
 	{
-		if (p_name != nameof(Tag._StringTag))
-			return false;
-		
 		var prop = new TagEditorProperty();
 		AddPropertyEditor(p_name, prop);
 		return true;

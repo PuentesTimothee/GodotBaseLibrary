@@ -104,7 +104,7 @@ public abstract partial class GameSingleSetting_Dropdown : GameSingleSetting_Spe
 
     public Array<string> _PossiblesValues = new();
     
-    public int GetValueIndex() => _PossiblesValues.IndexOf(_Value);
+    public int GetValueIndex() => _PossiblesValues.IndexOf(_Value ?? throw new InvalidOperationException());
     
     public GameSingleSetting_Dropdown(ESettingsSection p_settingsSection) : base(p_settingsSection, ESettingType.e_Dropdown)
     {

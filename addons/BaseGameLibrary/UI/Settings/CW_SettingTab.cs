@@ -1,8 +1,8 @@
 ﻿using ElementGodot.BaseGameLibrary.Settings;
-using ElementGodot.BaseGameLibrary.Tags;
 using ElementGodot.BaseGameLibrary.UI.Core;
 using Godot;
 using Godot.Collections;
+using Tag = ElementGodot.Tags.Tag;
 
 namespace ElementGodot.Scripts.UI.Settings;
 

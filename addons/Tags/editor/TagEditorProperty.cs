@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using Godot;
 
-namespace ElementGodot.BaseGameLibrary.Tags.editor;
+namespace ElementGodot.Tags.editor;
 
 [Tool]
 public partial class TagEditorProperty : EditorProperty, ISerializationListener
@@ -111,7 +111,7 @@ public partial class TagEditorProperty : EditorProperty, ISerializationListener
 		_containerButton.Text = string.IsNullOrEmpty(_currentValue) ? "(none)" : _currentValue;
 
 		TreeItem root = _tree.CreateItem();
-		var tagsManager = TagsManager.Instance;
+		var tagsManager = ElementGodot.Tags.TagsManager.Instance;
 
 		BuildTreeRecursive(root, tagsManager._RootNode!);
 
@@ -131,7 +131,7 @@ public partial class TagEditorProperty : EditorProperty, ISerializationListener
 			TreeItem item = _tree.CreateItem(p_parent);
 			item.SetText(0, child._TagKey);
 
-			bool selected = _currentValue == child._CompleteTagKey;
+			bool selected = _currentValue == child._TagKey;
 			item.AddButton(0, selected ? _checkedIcon : _uncheckedIcon);
 
 			_treeItemToNode[item] = child;
@@ -151,7 +151,7 @@ public partial class TagEditorProperty : EditorProperty, ISerializationListener
 		if (p_mouseButtonIndex != 1 || p_id != 0)
 			return;
 
-		string newValue = _treeItemToNode[p_item]._CompleteTagKey;
+		string newValue = _treeItemToNode[p_item]._TagKey;
 
 		if (newValue == _currentValue)
 			newValue = string.Empty;

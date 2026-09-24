@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using ElementGodot.BaseGameLibrary.Helpers;
-using ElementGodot.BaseGameLibrary.Tags;
+using ElementGodot.Tags;
 using Godot;
 using Godot.Collections;
 
@@ -20,7 +20,7 @@ public partial class CW_MenuManager : CW_Control
     
     public static Tag Tag_PauseMenu = null!;
     
-    protected System.Collections.Generic.Dictionary<Tag, CW_MenuContainer> _MenuContainers = new();
+    protected Dictionary<StringName, CW_MenuContainer> _MenuContainers = new();
     [Export] public Control? _Root = null!;
     
     protected Array<CW_MenuContainer> _Stack = new();
@@ -37,7 +37,7 @@ public partial class CW_MenuManager : CW_Control
     public CW_MenuManager()
     {
         CW_MenuManager.Tag_CombatMenu = Tag.RequestTag("menu.combat", ETagFetch.e_CreateOnError);
-        CW_MenuManager.Tag_FloorSelection = Tag.RequestTag("menu.floor_selection", ETagFetch.e_CreateOnError);
+        CW_MenuManager.Tag_FloorSelection = Tag.RequestTag("menu.floorSelection", ETagFetch.e_CreateOnError);
         
         CW_MenuManager.Tag_SettingMenu = Tag.RequestTag("menu.setting", ETagFetch.e_CreateOnError);
 
@@ -57,8 +57,10 @@ public partial class CW_MenuManager : CW_Control
         {
             if (child is CW_MenuContainer sContainer)
             {
-                if (!_MenuContainers.TryAdd(sContainer._LinkedTag, sContainer))
+                if (_MenuContainers.ContainsKey(sContainer._Tag.FullName()))
                     throw new InvalidDataException("Duplicate menu detected");
+                
+                _MenuContainers.Add(sContainer._Tag.FullName(), sContainer);
                 sContainer.On_Activated += OnMenuActivated;
                 sContainer.On_Deactivated += OnMenuDeactivated;
             }
@@ -70,7 +72,7 @@ public partial class CW_MenuManager : CW_Control
     // Open menu
     public void _OpenMenu(Tag p_menuTag)
     {
-        if (_MenuContainers.TryGetValue(p_menuTag, out CW_MenuContainer? menuContainer) && !menuContainer._IsActivated)
+        if (_MenuContainers.TryGetValue(p_menuTag.FullName(), out CW_MenuContainer? menuContainer) && !menuContainer._IsActivated)
             menuContainer._Activate();
         else
             MyLogger._LogErrorCommon($"MenuManager._OpenMenu: {p_menuTag} already openned");
@@ -95,13 +97,13 @@ public partial class CW_MenuManager : CW_Control
     {
         Array<CW_MenuContainer> sTag = new(_Stack);
         foreach (CW_MenuContainer menuContainer in sTag)
-            _CloseMenu(menuContainer._LinkedTag);
+            _CloseMenu(menuContainer._Tag);
     }
     
 
     public void _CloseMenu(Tag p_menuTag)
     {
-        if (_MenuContainers.TryGetValue(p_menuTag, out CW_MenuContainer? menuContainer) && menuContainer._IsActivated)
+        if (_MenuContainers.TryGetValue(p_menuTag.FullName(), out CW_MenuContainer? menuContainer) && menuContainer._IsActivated)
         {
             _Stack.Remove(menuContainer);
             menuContainer._Deactivate();

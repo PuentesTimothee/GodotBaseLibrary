@@ -1,47 +1,72 @@
-﻿using Godot;
+﻿using System.Linq;
+using ElementGodot.BaseGameLibrary.Helpers;
+using Godot;
 using Godot.Collections;
+using Microsoft.VisualBasic;
 
-namespace ElementGodot.BaseGameLibrary.Tags;
+namespace ElementGodot.Tags;
 
-public partial class TagNode(TagNode? p_ParentNode, StringName p_keyName) : GodotObject
+[Tool]
+public partial class TagNode(TagNode? p_parentNode, StringName p_keyName) : RefCounted
 {
     public TagNode() : this(null, "")
     {
-        
+
     }
-    
-    public TagNode? _ParentTagNode = p_ParentNode;
-    public Array<TagNode> _Childs = new();
+
+    public TagNode? _ParentTagNode = p_parentNode;
     public StringName _TagKey = p_keyName;
 
-    public StringName _CompleteTagKey 
+    public Array<TagNode> _Childs = new();
+
+    public override string ToString() => _TagKey;
+
+    public Variant SerializeToVariant()
     {
-        get
+        Array sChilds = new();
+        foreach (TagNode sNode in _Childs)
+            sChilds.Add(sNode.SerializeToVariant());
+        if (sChilds.Count > 0)
         {
-            string sName = _TagKey;
-            TagNode? node = _ParentTagNode;
-            while (node is not null && node._TagKey != "")
-            {
-                sName = node._TagKey + "." + sName;
-                node = node._ParentTagNode;
-            }
-            return sName;
+            if (_TagKey.IsEmpty)
+                return sChilds;
+            Dictionary sOut = new();
+            sOut[_TagKey] = sChilds;
+            return sOut;
         }
+        return _TagKey;
     }
     
+    public StringName CompleteTagKey()
+    {
+        string sName = _TagKey;
+        TagNode? node = _ParentTagNode;
+        while (node is not null && node._TagKey != "")
+        {
+            sName = node._TagKey + "." + sName;
+            node = node._ParentTagNode;
+        }
+
+        return sName;
+    }
+
     public TagNode? FindLinkedNode(string[] p_childName, int nIndex = 0)
     {
         if (p_childName.Length <= nIndex) return null;
-        
+
         foreach (TagNode sNode in _Childs)
         {
             if (sNode._TagKey == p_childName[nIndex])
+            {
+                if (p_childName.Length <= nIndex)
+                    return sNode;
                 return sNode.FindLinkedNode(p_childName, nIndex + 1);
+            }
         }
 
         return null;
     }
-    
+
     public bool IsChildOf(TagNode p_possibleParent)
     {
         if (this == p_possibleParent)
@@ -49,14 +74,14 @@ public partial class TagNode(TagNode? p_ParentNode, StringName p_keyName) : Godo
 
         if (_ParentTagNode is null)
             return false;
-        
+
         return _ParentTagNode.IsChildOf(p_possibleParent);
     }
-    
+
     public void AddChild(string[] p_childName, int nIndex = 0)
     {
         if (p_childName.Length <= nIndex) return;
-        
+
         foreach (TagNode sNode in _Childs)
         {
             if (sNode._TagKey == p_childName[nIndex])
@@ -71,6 +96,36 @@ public partial class TagNode(TagNode? p_ParentNode, StringName p_keyName) : Godo
         sNew.AddChild(p_childName, nIndex + 1);
         _Childs.Add(sNew);
     }
+
+    public void AddChild(Variant p_pData)
+    {
+        TagNode? sFoundChild = null;
+        
+        if (p_pData.VariantType == Variant.Type.Array && p_pData.AsGodotArray() is { } pArray)
+        {
+            foreach (Variant sKey in pArray)
+            {
+                if (sKey.VariantType == Variant.Type.Dictionary && sKey.AsGodotDictionary() is { } sDictionary)
+                {
+                    string sName = sDictionary.Keys.First().AsString();
+                    Variant sChilds = sDictionary.Values.First();
+                    sFoundChild = _Childs._FindByPredicate(p_sParsed => p_sParsed._TagKey == sName) ?? new(this, sName);
+                    sFoundChild.AddChild(sChilds);
+                }
+                else if (sKey.VariantType == Variant.Type.String && sKey.AsString() is { } sString)
+                    sFoundChild = _Childs._FindByPredicate(p_sParsed => p_sParsed._TagKey == sString) ?? new(this, sString);
+
+                if (sFoundChild != null)
+                    _Childs.Add(sFoundChild);
+            }
+        }
+        else if (p_pData.VariantType == Variant.Type.String && p_pData.AsString() is { } sString)
+        {
+            
+        }
+
+    }
+
 
     public void DestroyNodes()
     {
