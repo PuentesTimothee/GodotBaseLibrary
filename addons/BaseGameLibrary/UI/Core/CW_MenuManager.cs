@@ -10,16 +10,6 @@ namespace ElementGodot.BaseGameLibrary.UI.Core;
 [GlobalClass]
 public partial class CW_MenuManager : CW_Control
 {
-    public static Tag Tag_CombatMenu = null!;
-    public static Tag Tag_FloorSelection = null!;
-    
-    public static Tag Tag_SettingMenu = null!;
-
-    public static Tag Tag_MainMenu = null!;
-    public static Tag Tag_MainMenu_StartGame = null!;
-    
-    public static Tag Tag_PauseMenu = null!;
-    
     protected Dictionary<StringName, CW_MenuContainer> _MenuContainers = new();
     [Export] public Control? _Root = null!;
     
@@ -32,19 +22,6 @@ public partial class CW_MenuManager : CW_Control
         if (_Root == null)
             sData.Add("Must initialize property '_Root'.");
         return sData.ToArray();
-    }
-    
-    public CW_MenuManager()
-    {
-        CW_MenuManager.Tag_CombatMenu = Tag.RequestTag("menu.combat", ETagFetch.e_CreateOnError);
-        CW_MenuManager.Tag_FloorSelection = Tag.RequestTag("menu.floorSelection", ETagFetch.e_CreateOnError);
-        
-        CW_MenuManager.Tag_SettingMenu = Tag.RequestTag("menu.setting", ETagFetch.e_CreateOnError);
-
-        CW_MenuManager.Tag_PauseMenu = Tag.RequestTag("menu.pause", ETagFetch.e_CreateOnError);
-        
-        CW_MenuManager.Tag_MainMenu = Tag.RequestTag("menu.main", ETagFetch.e_CreateOnError);
-        CW_MenuManager.Tag_MainMenu_StartGame = Tag.RequestTag("menu.main.start", ETagFetch.e_CreateOnError);
     }
     
     public override void _Ready()

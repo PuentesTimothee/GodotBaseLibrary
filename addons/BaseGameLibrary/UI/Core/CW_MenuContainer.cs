@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Linq;
 using ElementGodot.Tags;
 using Godot;
@@ -12,7 +13,7 @@ public partial class CW_MenuContainer : CW_ActivatableContainer
 {
     [Export] protected TagRessource? _LinkedTagRessource ;
     protected Tag _LinkedTag = Tag.Invalid();
-    public Tag _Tag => _LinkedTagRessource is not null ? _LinkedTagRessource.GetTag() : _LinkedTag;
+    public Tag _Tag => _LinkedTagRessource is not null ? _LinkedTagRessource.GetTag() : _LinkedTag ?? throw new Exception();
     
     [Export] public bool _Closeable = true;
     [Export] public StringName _MenuName = "!!Invalid!!";

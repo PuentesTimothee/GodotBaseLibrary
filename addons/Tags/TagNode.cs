@@ -37,7 +37,7 @@ public partial class TagNode(TagNode? p_parentNode, StringName p_keyName) : RefC
         return _TagKey;
     }
     
-    public StringName CompleteTagKey()
+    public string CompleteTagKey()
     {
         string sName = _TagKey;
         TagNode? node = _ParentTagNode;

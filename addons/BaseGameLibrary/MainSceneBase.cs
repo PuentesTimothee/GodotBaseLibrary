@@ -51,21 +51,9 @@ public partial class MainSceneBase : Node3D
 		var args = new Array<string>(OS.GetCmdlineUserArgs());
 		MainSceneBase.IsTestMode = args.Contains("--testMode");
 
-		Dictionary<string, LogType> sValueString = new();
 		string sSeedString = "--seed=";
-		sValueString.Add("--log=", LogType.e_Default);
-		sValueString.Add("--logW=", LogType.e_Warning);
-		sValueString.Add("--logE=", LogType.e_Error);
-		
 		foreach (string arg in args)
 		{
-			foreach (var (str, val) in sValueString)
-			{
-				if (arg.StartsWith(str))
-					if (TimEnums.TryParseWithPrefix(arg.Substring(str.Length + 1), out LogSeverity logType))
-						MyLogger._SetSeverityFor(val, logType);
-			}
-
 			if (arg.StartsWith(sSeedString))
 				MainSceneBase.RandomNumberGenerator.Seed = ulong.Parse(arg.Substring(sSeedString.Length + 1));
 		}

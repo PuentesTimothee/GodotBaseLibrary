@@ -121,7 +121,7 @@ public partial class TagContainerInspectorControl : VBoxContainer
 		{
 			TreeItem item = _tree.CreateItem(p_parent);
 			item.SetText(0, child._TagKey);
-			item.AddButton(0, _currentValue.Contains(child._TagKey) ? _checkedIcon : _uncheckedIcon);
+			item.AddButton(0, _currentValue.Contains(child.CompleteTagKey()) ? _checkedIcon : _uncheckedIcon);
 			_treeItemToNode[item] = child;
 			BuildTreeRecursive(item, child);
 		}
@@ -139,7 +139,7 @@ public partial class TagContainerInspectorControl : VBoxContainer
 		if (p_mouseButtonIndex != 1 || p_id != 0)
 			return;
 
-		string tag = _treeItemToNode[p_item]._TagKey;
+		string tag = _treeItemToNode[p_item].CompleteTagKey();
 		var newValue = new GodotStringArray();
 		newValue.AddRange(_currentValue);
 

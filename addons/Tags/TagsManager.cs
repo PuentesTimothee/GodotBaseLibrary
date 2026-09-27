@@ -7,7 +7,6 @@ using ElementGodot.BaseGameLibrary.Datas;
 using ElementGodot.BaseGameLibrary.Helpers;
 
 using Godot;
-using Array = Godot.Collections.Array;
 
 namespace ElementGodot.Tags;
 
