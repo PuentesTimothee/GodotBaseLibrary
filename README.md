@@ -130,12 +130,3 @@ Il ajoute aussi l'inspecteur de `CW_MenuContainer`. `BasePlugin` fournit `AddCus
 ### Licence
 
 GPLv3 (`BaseGameLibrary/License.md`). Projet .NET 8 séparé : `ElementGodot.BaseGameLibrary.csproj`.
-
----
-
-## Points d'attention
-
-- `GameSingleSettings_Resolution` reprend le code de la locale (`TranslationServer`) : à finir.
-- `CW_SettingTab.InitAllOptions` a une boucle vide.
-- `CW_MenuContainer._GetConfigurationWarnings` parle de `_LinkedTag` alors que le tag vient de `GetTag()`.
-- Les fichiers `.uid` à côté des scripts ne doivent ni être supprimés ni modifiés (voir `CLAUDE.md`). Trois `.uid` sont orphelins depuis la suppression de leur script : `Tags/TagRessource.cs.uid`, `Tags/TagContainerResource.cs.uid` et `Tags/editor/TagContainerInspectorPlugin.cs.uid`.
