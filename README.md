@@ -8,7 +8,7 @@ Deux plugins maison, activés dans Project Settings > Plugins :
 | `GameplayTags` (`TagEditor`) | `Tags/` | Système de Gameplay Tags (comme les GameplayTags d'Unreal) + outils d'éditeur |
 
 
-Namespaces : `ElementGodot.BaseGameLibrary.*` et `ElementGodot.Tags[.editor]`.
+Namespaces : `BaseGameLibrary.*` et `Tags`.
 
 ---
 
