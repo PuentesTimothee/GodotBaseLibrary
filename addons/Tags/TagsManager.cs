@@ -103,24 +103,6 @@ public partial class TagsManager : Singleton<TagsManager>
 		MyLogger._LogTextCommon("TagsManager: Destroying Tag Tree: Finished.");
 	}
 	
-	public static TagRessource _TryToCreateMissingStateFile(Tag p_sTag)
-	{
-		TagRessource sRessource = TagRessource.MakeTagRessource(p_sTag.FullName());
-		
-		string sPath = $"{SingletonHelper.PATH_DATA}/Tag/Tag_{p_sTag}.tres";
-		if (ResourceLoader.Exists(sPath))
-			return sRessource;
-
-		if (ResourceSaver.Save(sRessource, sPath) is var error and not Error.Ok)
-		{
-			MyLogger._LogErrorCommon($"Couldn't Save Missing Tag with ID: {p_sTag} [{error}]");
-			return sRessource;
-		}
-
-		MyLogger._LogTextCommon($"Created Missing Tag with ID: {p_sTag}");
-		return sRessource;
-	}
-	
 	public static Tag RequestTag(StringName p_tag, ETagFetch p_errorGestion = ETagFetch.e_Default) =>
 		Instance._RequestTag(p_tag, p_errorGestion) ?? throw new AccessViolationException($"Tried to request a tag too soon");
 

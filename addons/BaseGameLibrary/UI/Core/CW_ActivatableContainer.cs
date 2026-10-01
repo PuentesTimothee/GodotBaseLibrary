@@ -3,6 +3,7 @@ using Godot;
 
 namespace ElementGodot.BaseGameLibrary.UI.Core;
 
+[GlobalClass] [Tool]
 public partial class CW_ActivatableContainer : PanelContainer
 {
     [Export] public bool _IsActivated { private set; get; } = false;

@@ -1,12 +1,13 @@
 // Copyright © Gamesmiths Guild.
 
 #if TOOLS
+using ElementGodot.BaseGameLibrary.editor;
 using Godot;
 
 namespace ElementGodot.Tags.editor;
 
 [Tool]
-public partial class QueryExpressionInspectorPlugin : EditorInspectorPlugin
+public partial class QueryExpressionInspectorPlugin : BaseEditorInspectorPlugin
 {
 	public override bool _CanHandle(GodotObject p_object) => p_object is TagQuery;
 

@@ -158,7 +158,7 @@ public partial class AssetRepairTool : EditorPlugin
 				continue;
 			}
 
-			if (value.As<Resource>() is TagContainerResource tagContainer)
+			if (value.As<Resource>() is TagContainer tagContainer)
 			{
 				modified |= AssetRepairTool.ValidateTagContainerProperty(tagContainer, p_node.Name, p_tagsManager);
 			}
@@ -168,36 +168,33 @@ public partial class AssetRepairTool : EditorPlugin
 	}
 
 	private static bool ValidateTagContainerProperty(
-		TagContainerResource p_container,
+		TagContainer p_container,
 		string p_nodeName,
 		TagsManager p_tagsManager)
 	{
 		if (p_container._Tags._IsEmpty())
 			return false;
-		
-		Array<StringName> originalTags = p_container._Tags;
-		Array<StringName> newTags = new();
+
+		Array<Tag> newTags = new();
 		bool modified = false;
 
-		foreach (StringName tag in originalTags)
+		foreach (Tag tag in p_container._Tags)
 		{
-			try
+			if (tag.IsValid())
 			{
-				Tag.RequestTag(tag, ETagFetch.e_ThrowOnError);
 				newTags.Add(tag);
+				continue;
 			}
-			catch (TagNotRegisteredException)
-			{
-				GD.PrintRich(
-					$"[color=LIGHT_STEEL_BLUE][RepairTool] Removing invalid tag [{tag}] from node {p_nodeName}.");
-				modified = true;
-			}
+
+			GD.PrintRich(
+				$"[color=LIGHT_STEEL_BLUE][RepairTool] Removing invalid tag [{tag._StringTag}] from node {p_nodeName}.");
+			modified = true;
 		}
 
 		if (modified)
 		{
 			p_container._Tags.Clear();
-			foreach (StringName tag in newTags)
+			foreach (Tag tag in newTags)
 				p_container._Tags.Add(tag);
 		}
 

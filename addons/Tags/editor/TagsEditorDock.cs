@@ -15,17 +15,12 @@ namespace ElementGodot.Tags.editor;
 [Tool]
 public partial class TagsEditorDock : EditorDock, ISerializationListener
 {
-	private readonly Dictionary<TreeItem, TagNode> _treeItemToNode = [];
-
 	private TagsManager? _tagsManager;
 
-	private Tree? _tree;
+	private TagTreeSelector? _selector;
 	private LineEdit? _tagNameTextField;
 	private Button? _addTagButton;
 	private Button? _refeshTagButton;
-
-	private Texture2D? _addIcon;
-	private Texture2D? _removeIcon;
 
 	public TagsEditorDock()
 	{
@@ -41,21 +36,21 @@ public partial class TagsEditorDock : EditorDock, ISerializationListener
 		_tagsManager = TagsManager.Instance;
 		//GetTree().Root.AddChild(_tagsManager);
 
-		_addIcon = EditorInterface.Singleton.GetEditorTheme().GetIcon("Add", "EditorIcons");
-		_removeIcon = EditorInterface.Singleton.GetEditorTheme().GetIcon("Remove", "EditorIcons");
-
 		BuildUi();
-		ConstructTagTree();
 
-		_tree!.ButtonClicked += TreeButtonClicked;
+		_selector!.On_AddChildRequested += OnAddChildRequested;
+		_selector!.On_RemoveRequested += OnRemoveRequested;
 		_addTagButton!.Pressed += AddTagButton_Pressed;
 		_refeshTagButton!.Pressed += RefreshTreeButton_Pressed;
 	}
 
 	public void OnBeforeSerialize()
 	{
-		if (_tree is not null)
-			_tree.ButtonClicked -= TreeButtonClicked;
+		if (_selector is not null)
+		{
+			_selector.On_AddChildRequested -= OnAddChildRequested;
+			_selector.On_RemoveRequested -= OnRemoveRequested;
+		}
 
 		if (_addTagButton is not null)
 			_addTagButton.Pressed -= AddTagButton_Pressed;
@@ -63,8 +58,11 @@ public partial class TagsEditorDock : EditorDock, ISerializationListener
 
 	public void OnAfterDeserialize()
 	{
-		if (_tree is not null)
-			_tree.ButtonClicked += TreeButtonClicked;
+		if (_selector is not null)
+		{
+			_selector.On_AddChildRequested += OnAddChildRequested;
+			_selector.On_RemoveRequested += OnRemoveRequested;
+		}
 
 		if (_addTagButton is not null)
 			_addTagButton.Pressed += AddTagButton_Pressed;
@@ -118,13 +116,9 @@ public partial class TagsEditorDock : EditorDock, ISerializationListener
 
 		hBox.AddChild(_refeshTagButton);
 
-		_tree = new Tree
-		{
-			SizeFlagsHorizontal = SizeFlags.ExpandFill,
-			SizeFlagsVertical = SizeFlags.ExpandFill,
-		};
+		_selector = new TagTreeSelector(ESelectionMode.e_Create);
 
-		vBox.AddChild(_tree);
+		vBox.AddChild(_selector);
 	}
 
 
@@ -149,88 +143,44 @@ public partial class TagsEditorDock : EditorDock, ISerializationListener
 	private void ReconstructTreeNode()
 	{
 		EnsureInitialized();
-		
-		_tree.Clear();
-		ConstructTagTree();
+
+		_selector.Refresh();
 	}
 
-	private void ConstructTagTree()
+	private void OnAddChildRequested(string p_tagKey)
 	{
 		EnsureInitialized();
 
-		TreeItem rootTreeNode = _tree.CreateItem();
-		_tree.HideRoot = true;
-
-		if (_tagsManager is null)
-		{
-			_tagsManager = new ElementGodot.Tags.TagsManager();
-			GetTree().Root.AddChild(_tagsManager);
-		}
-
-		if (_tagsManager._RootNode!._Childs.Count == 0)
-		{
-			TreeItem childTreeNode = _tree.CreateItem(rootTreeNode);
-			childTreeNode.SetText(0, "No tag has been registered yet.");
-			childTreeNode.SetCustomColor(0, Color.FromHtml("EED202"));
-			return;
-		}
-
-		BuildTreeRecursively(_tree, rootTreeNode, _tagsManager._RootNode);
+		_tagNameTextField.Text = $"{p_tagKey}.";
+		_tagNameTextField.GrabFocus();
+		_tagNameTextField.CaretColumn = _tagNameTextField.Text.Length;
 	}
 
-	private void BuildTreeRecursively(Tree p_tree, TreeItem p_currentTreeItem, TagNode p_currentNode)
-	{
-		foreach (TagNode childTagNode in p_currentNode._Childs)
-		{
-			TreeItem childTreeNode = p_tree.CreateItem(p_currentTreeItem);
-			childTreeNode.SetText(0, childTagNode._TagKey);
-			childTreeNode.AddButton(0, _addIcon);
-			childTreeNode.AddButton(0, _removeIcon);
-
-			_treeItemToNode.Add(childTreeNode, childTagNode);
-
-			BuildTreeRecursively(p_tree, childTreeNode, childTagNode);
-		}
-	}
-
-	private void TreeButtonClicked(TreeItem p_item, long p_column, long p_id, long p_mouseButtonIndex)
+	private void OnRemoveRequested(string p_tagKey)
 	{
 		EnsureInitialized();
 
-		if (p_mouseButtonIndex == 1)
+		_tagsManager._LoadedTags.RemoveWhere((string tag) =>
+			string.Equals(tag, p_tagKey, StringComparison.OrdinalIgnoreCase) ||
+			tag.StartsWith(p_tagKey + ".", StringComparison.InvariantCultureIgnoreCase));
+
+		int lastSeparator = p_tagKey.LastIndexOf('.');
+		if (lastSeparator > 0)
 		{
-			if (p_id == 0)
-			{
-				_tagNameTextField.Text = $"{_treeItemToNode[p_item]._TagKey}.";
-				_tagNameTextField.GrabFocus();
-				_tagNameTextField.CaretColumn = _tagNameTextField.Text.Length;
-			}
-
-			if (p_id == 1)
-			{
-				TagNode selectedTag = _treeItemToNode[p_item];
-				foreach (string tag in _tagsManager._LoadedTags)
-				{
-					if (string.Equals(tag, selectedTag._TagKey, StringComparison.OrdinalIgnoreCase) ||
-						tag.StartsWith(selectedTag._TagKey + ".", StringComparison.InvariantCultureIgnoreCase))
-						_tagsManager._LoadedTags.Remove(tag);
-				}
-
-				if (selectedTag._ParentTagNode is not null
-					&& !_tagsManager.Contains(selectedTag._ParentTagNode._TagKey))
-					_tagsManager.Add(selectedTag._ParentTagNode._TagKey);
-
-				_tagsManager._SaveCurrentTags();
-				ReconstructTreeNode();
-			}
+			string parentKey = p_tagKey[..lastSeparator];
+			if (!_tagsManager.Contains(parentKey))
+				_tagsManager.Add(parentKey);
 		}
+
+		_tagsManager._SaveCurrentTags();
+		ReconstructTreeNode();
 	}
 
-	[MemberNotNull(nameof(TagsEditorDock._tagsManager), nameof(TagsEditorDock._tree), nameof(TagsEditorDock._tagNameTextField))]
+	[MemberNotNull(nameof(TagsEditorDock._tagsManager), nameof(TagsEditorDock._selector), nameof(TagsEditorDock._tagNameTextField))]
 	private void EnsureInitialized()
 	{
 		Debug.Assert(
-			_tree is not null, $"{nameof(TagsEditorDock._tree)} should have been initialized on _Ready().");
+			_selector is not null, $"{nameof(TagsEditorDock._selector)} should have been initialized on _Ready().");
 		Debug.Assert(
 			_tagNameTextField is not null, $"{nameof(TagsEditorDock._tagNameTextField)} should have been initialized on _Ready().");
 		Debug.Assert(

@@ -34,10 +34,9 @@ public partial class TagEditor : BasePlugin
 		_tagsEditorDock = new TagsEditorDock();
 		AddDock(_tagsEditorDock);
 		
-		AddCustomInspectorPlugin<TagContainerInspectorPlugin>();
 		AddCustomInspectorPlugin<QueryExpressionInspectorPlugin>();
 		AddCustomInspectorPlugin<TagInspectorPlugin>();
-
+		
 		AddToolMenuItem("Repair assets tags", new Callable(this, MethodName.CallAssetRepairTool));
 	}
 

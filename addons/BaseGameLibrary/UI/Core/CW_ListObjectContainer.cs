@@ -17,7 +17,6 @@ public interface IControlListObject
 {
 }
 
-[Tool]
 [GlobalClass]
 public partial class CW_ListObjectContainer : MarginContainer
 {

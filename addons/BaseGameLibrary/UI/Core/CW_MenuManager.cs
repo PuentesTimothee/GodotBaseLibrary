@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using ElementGodot.BaseGameLibrary.Helpers;
+using ElementGodot.Scripts.UI;
 using ElementGodot.Tags;
 using Godot;
 using Godot.Collections;
@@ -34,10 +35,10 @@ public partial class CW_MenuManager : CW_Control
         {
             if (child is CW_MenuContainer sContainer)
             {
-                if (_MenuContainers.ContainsKey(sContainer._Tag.FullName()))
+                if (_MenuContainers.ContainsKey(sContainer.GetTag().FullName()))
                     throw new InvalidDataException("Duplicate menu detected");
                 
-                _MenuContainers.Add(sContainer._Tag.FullName(), sContainer);
+                _MenuContainers.Add(sContainer.GetTag().FullName(), sContainer);
                 sContainer.On_Activated += OnMenuActivated;
                 sContainer.On_Deactivated += OnMenuDeactivated;
             }
@@ -74,7 +75,7 @@ public partial class CW_MenuManager : CW_Control
     {
         Array<CW_MenuContainer> sTag = new(_Stack);
         foreach (CW_MenuContainer menuContainer in sTag)
-            _CloseMenu(menuContainer._Tag);
+            _CloseMenu(menuContainer.GetTag());
     }
     
 

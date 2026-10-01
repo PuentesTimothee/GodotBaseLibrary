@@ -8,13 +8,20 @@ using Godot;
 namespace ElementGodot.BaseGameLibrary.editor;
 
 [Tool]
-public partial class MenuContainerInspectorControl(CW_MenuContainer p_menuContainer) : RichTextLabel
+public partial class MenuContainerInspectorControl(CW_MenuContainer? p_menuContainer) : RichTextLabel
 {
-	protected CW_MenuContainer _MenuContainer = p_menuContainer;
-	
+	protected CW_MenuContainer? _MenuContainer = p_menuContainer;
+
+	public MenuContainerInspectorControl() : this(null)
+	{
+	}
+
 	public override void _Process(double p_delta)
 	{
-		Text = $"Current tag {_MenuContainer._Tag}";
+		FitContent = true;
+
+		if (_MenuContainer is not null)
+			Text = $"Current tag: [{_MenuContainer.GetTag()}]";
 	}
 	
 }

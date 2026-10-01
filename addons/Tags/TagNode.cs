@@ -58,7 +58,7 @@ public partial class TagNode(TagNode? p_parentNode, StringName p_keyName) : RefC
         {
             if (sNode._TagKey == p_childName[nIndex])
             {
-                if (p_childName.Length <= nIndex)
+                if (nIndex + 1 >= p_childName.Length)
                     return sNode;
                 return sNode.FindLinkedNode(p_childName, nIndex + 1);
             }
@@ -130,10 +130,7 @@ public partial class TagNode(TagNode? p_parentNode, StringName p_keyName) : RefC
     public void DestroyNodes()
     {
         foreach (TagNode sNode in _Childs)
-        {
             sNode.DestroyNodes();
-            sNode.Free();
-        }
         _Childs.Clear();
     }
 }

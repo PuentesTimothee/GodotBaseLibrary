@@ -13,10 +13,7 @@ public partial class BasePlugin : EditorPlugin
 	public override void _ExitTree()
 	{
 		foreach (EditorInspectorPlugin plugin in _tagInspectorPlugins)
-		{
 			RemoveInspectorPlugin(plugin);
-			plugin.Free();
-		}
 		_tagInspectorPlugins.Clear();
 	}
 

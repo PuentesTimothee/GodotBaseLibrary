@@ -12,73 +12,43 @@ namespace ElementGodot.Tags.editor;
 [Tool]
 public partial class TagContainerInspectorControl : VBoxContainer
 {
-	private readonly Dictionary<TreeItem, TagNode> _treeItemToNode = [];
+	private readonly StringName? _restrictionString;
 
-	private Button? _containerButton;
-	private ScrollContainer? _scroll;
-	private Tree? _tree;
-	private Texture2D? _checkedIcon;
-	private Texture2D? _uncheckedIcon;
+	private TagTreeSelector? _selector;
+	private Label? _selectedLabel;
 	private GodotStringArray _currentValue = [];
 
 	public event Action<GodotStringArray>? On_ValueChanged;
+
+	public TagContainerInspectorControl() { }
+
+	public TagContainerInspectorControl(StringName? p_restrictionString) => _restrictionString = p_restrictionString;
 
 	public override void _Ready()
 	{
 		SizeFlagsHorizontal = SizeFlags.ExpandFill;
 
-		_containerButton = new Button
+		_selector = new TagTreeSelector(ESelectionMode.e_Multiple, _restrictionString);
+		_selector.SetSelection(_currentValue);
+		_selector.On_SelectionChanged += OnSelectionChanged;
+		AddChild(_selector);
+
+		_selectedLabel = new Label
 		{
-			ToggleMode = true,
 			SizeFlagsHorizontal = SizeFlags.ExpandFill,
 		};
-		_containerButton.Toggled += OnToggled;
-		AddChild(_containerButton);
-
-		_scroll = new ScrollContainer
-		{
-			Visible = false,
-			CustomMinimumSize = new Vector2(0, 220),
-			SizeFlagsHorizontal = SizeFlags.ExpandFill,
-			SizeFlagsVertical = SizeFlags.ExpandFill,
-		};
-
-		_tree = new Tree
-		{
-			HideRoot = true,
-			SizeFlagsHorizontal = SizeFlags.ExpandFill,
-			SizeFlagsVertical = SizeFlags.ExpandFill,
-		};
-		_tree.ButtonClicked += OnTreeButtonClicked;
-
-		_scroll.AddChild(_tree);
-		AddChild(_scroll);
-
-		_checkedIcon = EditorInterface.Singleton
-			.GetEditorTheme()
-			.GetIcon("GuiChecked", "EditorIcons");
-		_uncheckedIcon = EditorInterface.Singleton
-			.GetEditorTheme()
-			.GetIcon("GuiUnchecked", "EditorIcons");
-
-		RebuildTree();
+		AddChild(_selectedLabel);
+		RefreshSelectedLabel();
 	}
 
 	public override void _ExitTree()
 	{
-		if (_containerButton is not null && TagContainerInspectorControl.IsInstanceValid(_containerButton))
-			_containerButton.Toggled -= OnToggled;
-
-		if (_tree is not null && TagContainerInspectorControl.IsInstanceValid(_tree))
-			_tree.ButtonClicked -= OnTreeButtonClicked;
+		if (_selector is not null && IsInstanceValid(_selector))
+			_selector.On_SelectionChanged -= OnSelectionChanged;
 
 		On_ValueChanged = null;
-		_treeItemToNode.Clear();
-		_containerButton = null;
-		_scroll = null;
-		_tree = null;
-		_checkedIcon = null;
-		_uncheckedIcon = null;
+		_selector = null;
+		_selectedLabel = null;
 		base._ExitTree();
 	}
 
@@ -89,73 +59,36 @@ public partial class TagContainerInspectorControl : VBoxContainer
 			sArray.Add(sTag.FullName());
 		SetValue(sArray);
 	}
-	
+
 	public void SetValue(GodotStringArray p_sArray)
 	{
 		_currentValue = [];
 		_currentValue.AddRange(p_sArray);
 
-		if (_tree is not null)
-			RebuildTree();
+		_selector?.SetSelection(_currentValue);
+		RefreshSelectedLabel();
 	}
 
-	private void RebuildTree()
+	private void OnSelectionChanged(IReadOnlyCollection<string> p_selection)
 	{
-		if (_tree is null || _containerButton is null || _checkedIcon is null || _uncheckedIcon is null)
-			return;
+		GodotStringArray newValue = new();
+		newValue.AddRange(p_selection);
 
-		_tree.Clear();
-		_treeItemToNode.Clear();
-		_containerButton.Text = $"Container (size: {_currentValue.Count})";
-
-		TreeItem root = _tree.CreateItem();
-		BuildTreeRecursive(root, ElementGodot.Tags.TagsManager.Instance._RootNode!);
-	}
-
-	private void BuildTreeRecursive(TreeItem p_parent, TagNode p_node)
-	{
-		if (_tree is null)
-			return;
-
-		foreach (TagNode child in p_node._Childs)
-		{
-			TreeItem item = _tree.CreateItem(p_parent);
-			item.SetText(0, child._TagKey);
-			item.AddButton(0, _currentValue.Contains(child.CompleteTagKey()) ? _checkedIcon : _uncheckedIcon);
-			_treeItemToNode[item] = child;
-			BuildTreeRecursive(item, child);
-		}
-	}
-
-	private void OnTreeButtonClicked(
-		TreeItem p_item,
-		long p_column,
-		long p_id,
-		long p_mouseButtonIndex)
-	{
-		if (_tree is null || !TagContainerInspectorControl.IsInstanceValid(_tree))
-			return;
-
-		if (p_mouseButtonIndex != 1 || p_id != 0)
-			return;
-
-		string tag = _treeItemToNode[p_item].CompleteTagKey();
-		var newValue = new GodotStringArray();
-		newValue.AddRange(_currentValue);
-
-		if (!newValue.Remove(tag))
-			newValue.Add(tag);
-
-		SetValue(newValue);
+		_currentValue = newValue;
+		RefreshSelectedLabel();
 		On_ValueChanged?.Invoke(newValue);
 	}
 
-	private void OnToggled(bool p_toggled)
+	private void RefreshSelectedLabel()
 	{
-		if (_scroll is null || !TagContainerInspectorControl.IsInstanceValid(_scroll))
+		if (_selectedLabel is null)
 			return;
 
-		_scroll.Visible = p_toggled;
+		List<string> lines = new();
+		foreach (string key in _currentValue)
+			lines.Add($"- {key}");
+
+		_selectedLabel.Text = lines.Count == 0 ? "No tag selected" : string.Join("\n", lines);
 	}
 }
 #endif

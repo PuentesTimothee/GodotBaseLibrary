@@ -1,93 +1,141 @@
-# Godot Base Library
+# addons/
 
-## Overview
+Deux plugins maison, activés dans Project Settings > Plugins :
 
-A repository useable as a Template in order to kickstart [Godot Project](https://godotengine.org/fr/) faster.
-Work with **4.7.2** (Tested) and laters (Untested for now)
+| Plugin | Dossier | Rôle |
+|---|---|---|
+| `BaseGameLibraryPlugin` | `BaseGameLibrary/` | Socle du jeu : données, settings, input, logs, UI de menus |
+| `GameplayTags` (`TagEditor`) | `Tags/` | Système de Gameplay Tags (comme les GameplayTags d'Unreal) + outils d'éditeur |
 
-The repository make a plugin that need enabling in your project settings. Useable outside of Repository template.
 
-## Gameplay
+Namespaces : `ElementGodot.BaseGameLibrary.*` et `ElementGodot.Tags[.editor]`.
 
-  - **Mainscene**:
-    - *Inheritable*
-    - Root class set it in your project as the Root Node. Manage the rest of the Plugins subsystems
+---
 
-  - **GameModeBase**:
-    - *Inheritable* 
-    - Gameplay brick that can swaped around with your MainScene.
+## Tags/
 
-## Datas
+### Concepts
 
-  - **GameDatasManager**:
-    - *Sealed*
-    - This class is loaded on start-up and after the **TagsManager** & **GameSettings**
-    - Extend this class and use AddManager to easily Load data from disk from your Singletons
-  
-  - **Singleton** & **DataSingleton**
-    - *Inheritable* 
-    - A **Node** based singleton system. Use the Data version for additional compatibility with the GameDatasManagers
+- **Tag** (`Tag.cs`) : `Resource` qui stocke une clé hiérarchique dans `[Export] _StringTag` (ex. `spell.fire.01`). Le `TagNode` correspondant est retrouvé à la demande dans le `TagsManager`. Deux `Tag` de même clé sont égaux (`Equals` / `GetHashCode`). Un tag inconnu du manager est invalide (`IsValid()` faux, `FullName()` = `!!Invalid!!`).
+- **TagContainer** (`TagContainer.cs`) : `Resource` contenant un `[Export] Array<Tag> _Tags` sans doublon.
+- **TagsManager** (`TagsManager.cs`) : autoload `Instance_TagsManager`. Charge l'arbre de tags depuis `res://Datas/Tags.json`, le sauvegarde (`_SaveCurrentTags`) et fournit `TagsManager.RequestTag(clé, ETagFetch)`.
+- **TagNode** (`TagNode.cs`) : nœud de l'arbre (clé, parent, enfants). `CompleteTagKey()` donne la clé complète.
+- **TagQuery** (`TagQuery.cs`) : `Resource` de requête sur un `TagContainer` (`EQueryType` : any / exact / no match, sur des tags ou des sous-expressions).
+- **TagAttribute** (`TagAttributes.cs`) : `[Tag("spell")]` sur un membre `Tag` / `TagContainer` restreint la sélection de l'inspecteur au sous-arbre `spell`.
 
-  - **RawSingleton**
-    - *Inheritable* 
-    - Same as before minus the Node part
+### Obtenir un tag dans le code
 
-## Tags
+```csharp
+Tag tag = Tag.RequestTag("spell.fire.01");                          // ETagFetch.e_Default : tag invalide si inconnu
+Tag tag = Tag.RequestTag("menu.main", ETagFetch.e_CreateOnError);   // crée le tag s'il n'existe pas
+Tag tag = Tag.RequestTag("menu.main", ETagFetch.e_ThrowOnError);    // TagNotRegisteredException si inconnu
+```
 
-  - **Tag**:
-    - Sealed.
-    - Use this to represent, compare premade StringName. Better to use than magic Number in editor and code.
-    - Use RequestTag and NEVER Create one by hand
+Une clé est insensible à la casse (passée en minuscules).
 
-  - **TagEditor**:
-    - A editor dock to easily manage/add/remove yours tags
+### Sauvegarde
 
-## Inputs
+Les membres `[Export] Tag` et `[Export] TagContainer` sont sauvegardés dans les `.tres` / `.tscn` (sous-ressources avec `_StringTag`). Les tags doivent exister dans `Datas/Tags.json` pour être valides au chargement.
 
-  -InputNode
-    - *Inheritable*
-    - Node instantiated in the Main Scene taking care of most of the Gameplay Input
-    
-  -InputHandler
-    - *Inheritable* 
-    - Ressource loaded to represent the default behaviour to have
-    - Possibility to register specific input to each instance and swap them around as you wish (Like a Menu and a Gameplay handler swapped arround as you swap the GameMode)
-    - Can be hot swapped
-  
-  -InputList
-    - *Override this*
-    - Represent in a enum all the possible Input of your game
+Argument de lancement : `--exportTag` réécrit `Tags.json` au démarrage.
 
-## Settings
-  
-  - GameSettings
-    - *Inheritable* -> Override *_InitOptions* and call *_AddSettingFromTag* to add your own options
-    - Use to Load&Save option in a XML  
+### Éditeur (`Tags/editor/`)
 
-  - GameSingleSetting
-    - *Inheritable*
-    - Use this class or one of it's parent to implement your custom settings
+| Fichier | Rôle |
+|---|---|
+| `TagsEditorDock` | Dock « Tags » (haut gauche de la zone droite) : liste l'arbre, `+` préremplit le champ pour créer un enfant, `-` supprime le tag et ses enfants |
+| `TagTreeSelector` | Arbre de tags réutilisable, 3 modes : `e_Single` (un tag), `e_Multiple` (plusieurs), `e_Create` (boutons + / - du dock). Échange toujours des clés complètes |
+| `TagInspectorControl` | Adaptateur `e_Single` : `SetValue`, événement `On_ValueChanged(Tag)` |
+| `TagContainerInspectorControl` | Adaptateur `e_Multiple` : `SetValue`, événement `On_ValueChanged`, liste lisible des tags sélectionnés en dessous |
+| `TagEditorProperty` | `EditorProperty` d'un membre `Tag` |
+| `TagContainerEditorProperty` | `EditorProperty` d'un membre `TagContainer` |
+| `TagInspectorPlugin` | Branche les deux `EditorProperty` ci-dessus sur les membres de type `Tag` / `TagContainer` |
+| `QueryExpressionInspectorPlugin` / `QueryExpressionEditorControl` | Éditeur visuel d'un `TagQuery` |
+| `AssetRepairTool` | Menu Project > Tools > « Repair assets tags » : parcourt les scènes de `res://` et retire des `TagContainer` les tags invalides |
+| `EditorUtils` | Classe vide |
 
-## UI
+### Licence
 
-  -  **CW_Control**
-    - The parent of most widgets
+Une partie du code vient de Gamesmiths Guild (MIT, voir `Tags/ForgeCopyright.txt`).
 
-  - **CW_MenuManger**
-    - Root of all menu
-    - Make a scene out of it and add all of your menu With the associate **Tag**
-   
-  - **CW_Activatable**
-    - Represent part of the UI that can be toggle On/Off Like a menu, a dropdown, a "More Details part"
-  - **CW_MenuContainer**
-    - Represent a menu
+---
 
-  - **CW_ListObjectContainer**
-    - Represent any list with Data, you can init the list with any singular or list of **Godot.Object**
-  - **CW_Header**
-    - Header of menu for Menu title/CloseControl/Anything your heart desire.
-  - **CW_Footer**
-    - Display all active Shortcut & Action
+## BaseGameLibrary/
 
-## Helpers
-  See the files for all functions
+### Plugin et autoloads
+
+`BaseGameLibraryPlugin` enregistre deux autoloads à l'activation :
+
+- `Instance_GameDatasManager` (`Datas/GameDatasManager.cs`)
+- `Instance_GameSettings` (`Settings/GameSettings.cs`)
+
+Il ajoute aussi l'inspecteur de `CW_MenuContainer`. `BasePlugin` fournit `AddCustomInspectorPlugin<T>()` aux deux plugins.
+
+### Datas/
+
+- `Singleton.cs` :
+  - `DataNode` : à `_Ready`, essaie `_LoadFromJson()` puis `_LoadFromResource()`.
+  - `Singleton<T>` : `DataNode` avec `Instance` statique.
+  - `DataSingleton` : `DataNode` géré par `GameDatasManager`.
+  - `RawSingleton<T>` : singleton C# simple.
+  - `SingletonHelper.PATH_DATA` = `res://Datas`.
+- `GameDatasManager` : au démarrage, instancie par réflexion **toute sous-classe concrète de `DataSingleton`** et l'ajoute comme enfant. `GameDatasManager.GetDatas<T>()` retourne le manager voulu (lève `DataSingletonException` s'il n'existe pas).
+
+### Gameplay/ et MainSceneBase
+
+- `GameModeBase` : `_GameModeBegin()` à surcharger, signal `OnGamemodeReady`.
+- `MainSceneBase` (`Node3D`) : point d'entrée. Crée l'`InputNode`, instancie le `CW_MenuManager` depuis `_MenuManagerPacked`, expose `MenuManager`, `InputNode`, `GetNakedMode()` et un `RandomNumberGenerator` statique.
+  - Arguments de lancement : `--testMode`, `--seed=N`.
+
+### Settings/
+
+- `GameSettings` : valeurs stockées par clé de tag, fichier `Datas/BaseSettings.json`. Accès : `GetSetting<T>(Tag)` et `GetSettingValue<T>(Tag)`. Les tags sont dans `GameSettings_Tags`.
+- `GameSingleSetting` : `Resource` abstraite (section, type bool / int / dropdown) qui sait créer son `Control`.
+- `GameSettings_Visual` : settings concrets (locale, résolution, type d'affichage, VSync).
+
+### Input/
+
+- `BaseInputNode` : reçoit les événements et les transmet à un `InputHandler`. `_Register(EInputList | string, delegate)` / `_Unregister`.
+- `InputHandler` : `Resource` qui associe une action d'input à des délégués (`_UnhandledInput`).
+- `EInputList` : liste des actions du jeu.
+
+### Helpers/
+
+| Fichier | Contenu |
+|---|---|
+| `MyLogger` | Logs par sévérité et type. Arguments : `--log=`, `--logW=`, `--logE=` |
+| `Reflection` | `GetEnumerableOfType<T>()`, `GetEnumerableOfTypeCreated<T>()` |
+| `TimCollection` | `_FindByPredicate`, `_ForEach`, `_IsEmpty` |
+| `TimEnums` | Préfixe `e_` : parsing, traduction d'enums |
+| `TimHelpers` | `FindParentOfType`, `Tr_Format`, chargement JSON, texte coloré BBCode, extensions `Tag` |
+| `TimMath` | `BaseRange<T>` |
+| `TimString` | `_StripBBCode` |
+
+### UI/
+
+- `CW_Control` : `Control` de base, prévenu quand le game mode est prêt.
+- `CW_ActivatableContainer` : conteneur qui s'affiche / se masque (`_Activate`, `_Deactivate`, événements `On_Activated` / `On_Deactivated`).
+- `CW_MenuContainer` : un menu, identifié par un `Tag` (`GetTag()` à surcharger), avec `CW_Header` et `CW_Footer`.
+- `CW_MenuManager` : pile de menus. Indexe ses enfants `CW_MenuContainer` par tag ; `_OpenMenu(Tag)`.
+- `CW_ListObjectContainer` : liste générique de widgets (`IControlListWidget` / `IControlListObject`).
+- `CW_InputAction`, `CW_Tooltip` : widgets d'input et d'infobulle.
+- `Settings/CW_SettingEntry`, `CW_SettingTab` : lignes et onglets du menu de settings. `CW_SettingEntry._CurrentTag` désigne le setting affiché.
+
+### editor/
+
+- `BaseEditorInspectorPlugin` : base des plugins d'inspecteur du projet.
+- `MenuContainerInspectorPlugin` / `MenuContainerInspectorControl` : affichent « Current tag: [...] » dans l'inspecteur d'un `CW_MenuContainer`.
+- `Ic_Menu.svg` : icône de `CW_MenuContainer`.
+
+### Licence
+
+GPLv3 (`BaseGameLibrary/License.md`). Projet .NET 8 séparé : `ElementGodot.BaseGameLibrary.csproj`.
+
+---
+
+## Points d'attention
+
+- `GameSingleSettings_Resolution` reprend le code de la locale (`TranslationServer`) : à finir.
+- `CW_SettingTab.InitAllOptions` a une boucle vide.
+- `CW_MenuContainer._GetConfigurationWarnings` parle de `_LinkedTag` alors que le tag vient de `GetTag()`.
+- Les fichiers `.uid` à côté des scripts ne doivent ni être supprimés ni modifiés (voir `CLAUDE.md`). Trois `.uid` sont orphelins depuis la suppression de leur script : `Tags/TagRessource.cs.uid`, `Tags/TagContainerResource.cs.uid` et `Tags/editor/TagContainerInspectorPlugin.cs.uid`.

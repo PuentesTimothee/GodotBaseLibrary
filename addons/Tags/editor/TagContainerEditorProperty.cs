@@ -1,6 +1,7 @@
 // Copyright © Gamesmiths Guild.
 
 #if TOOLS
+using System.Collections.Generic;
 using Godot;
 using Godot.Collections;
 
@@ -10,10 +11,13 @@ namespace ElementGodot.Tags.editor;
 public partial class TagContainerEditorProperty : EditorProperty, ISerializationListener
 {
 	private TagContainerInspectorControl? _editor;
+	private readonly StringName? _restrictionString;
+
+	public TagContainerEditorProperty(StringName? p_restrictionString) => _restrictionString = p_restrictionString;
 
 	public override void _Ready()
 	{
-		_editor = new TagContainerInspectorControl();
+		_editor = new TagContainerInspectorControl(_restrictionString);
 		_editor.On_ValueChanged += OnValueChanged;
 		AddChild(_editor);
 		SetBottomEditor(_editor);
@@ -26,7 +30,9 @@ public partial class TagContainerEditorProperty : EditorProperty, ISerialization
 
 		GodotObject obj = GetEditedObject();
 		string propertyName = GetEditedProperty();
-		_editor.SetValue(obj.Get(propertyName).AsGodotArray<string>());
+
+		TagContainer? container = obj.Get(propertyName).As<TagContainer>();
+		_editor.SetValue(container ?? new TagContainer());
 	}
 
 	public override void _ExitTree()
@@ -48,7 +54,11 @@ public partial class TagContainerEditorProperty : EditorProperty, ISerialization
 
 	private void OnValueChanged(Array<string> p_value)
 	{
-		EmitChanged(GetEditedProperty(), p_value);
+		HashSet<Tag> tags = new();
+		foreach (string key in p_value)
+			tags.Add(Tag.RequestTag(key));
+
+		EmitChanged(GetEditedProperty(), Variant.From(new TagContainer(tags)));
 	}
 
 	private void ReleaseUiState()

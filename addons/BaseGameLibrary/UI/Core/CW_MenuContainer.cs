@@ -1,19 +1,16 @@
 ﻿
-using System;
 using System.Linq;
 using ElementGodot.Tags;
 using Godot;
 using Godot.Collections;
-using Tag = ElementGodot.Tags.Tag;
 
 namespace ElementGodot.BaseGameLibrary.UI.Core;
 
-[GlobalClass, Tool]
+[GlobalClass, Icon("res://addons/BaseGameLibrary/editor/Ic_Menu.svg")] [Tool]
 public partial class CW_MenuContainer : CW_ActivatableContainer
 {
-    [Export] protected TagRessource? _LinkedTagRessource ;
-    protected Tag _LinkedTag = Tag.Invalid();
-    public Tag _Tag => _LinkedTagRessource is not null ? _LinkedTagRessource.GetTag() : _LinkedTag ?? throw new Exception();
+    protected Tag _TagInternal => Tag.Invalid();
+    public virtual Tag GetTag() => _TagInternal;
     
     [Export] public bool _Closeable = true;
     [Export] public StringName _MenuName = "!!Invalid!!";
@@ -26,10 +23,8 @@ public partial class CW_MenuContainer : CW_ActivatableContainer
     public override string[] _GetConfigurationWarnings()
     {
         Array<string> sData = new();
-        if (!_LinkedTag.IsValid() && _LinkedTagRessource is null)
+        if (GetTag() is null || !GetTag().IsValid())
             sData.Add("Must initialize property '_LinkedTag'.");
         return sData.ToArray();
     }
-    
-    
 }

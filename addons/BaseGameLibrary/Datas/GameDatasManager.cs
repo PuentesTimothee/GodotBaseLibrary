@@ -21,6 +21,8 @@ public partial class GameDatasManager : Singleton<GameDatasManager>
     
     public override void _Ready()
     {
+        base._Ready();
+        
         foreach (Type sGameDataManagerType in ReflectionHelper.GetEnumerableOfType<DataSingleton>())
             AddManager(sGameDataManagerType);
     }
