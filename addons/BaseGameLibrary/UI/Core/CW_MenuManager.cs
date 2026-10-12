@@ -1,29 +1,20 @@
 ﻿using System.IO;
 using System.Linq;
-using ElementGodot.BaseGameLibrary.Helpers;
-using ElementGodot.Scripts.UI;
-using ElementGodot.Tags;
+using BaseGameLibrary.Helpers;
+using Tags;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary.UI.Core;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.UI.Core;
 
 [GlobalClass]
 public partial class CW_MenuManager : CW_Control
 {
     protected Dictionary<StringName, CW_MenuContainer> _MenuContainers = new();
-    [Export] public Control? _Root = null!;
+    [Export, NodeNeeded] public Control? _Root = null!;
     
     protected Array<CW_MenuContainer> _Stack = new();
-
-    // Warn users if the value hasn't been set.
-    public override string[] _GetConfigurationWarnings()
-    {
-        Array<string> sData = new();
-        if (_Root == null)
-            sData.Add("Must initialize property '_Root'.");
-        return sData.ToArray();
-    }
     
     public override void _Ready()
     {
@@ -56,6 +47,14 @@ public partial class CW_MenuManager : CW_Control
             MyLogger._LogErrorCommon($"MenuManager._OpenMenu: {p_menuTag} already openned");
     }
     
+    public void _ToggleMenu(Tag p_menuTag)
+    {
+        if (_MenuContainers.TryGetValue(p_menuTag.FullName(), out CW_MenuContainer? menuContainer) && !menuContainer._IsActivated)
+            menuContainer._ToggleState();
+        else
+            MyLogger._LogErrorCommon($"MenuManager._ToggleMenu: {p_menuTag} already openned");
+    }
+    
     private void OnMenuActivated(CW_ActivatableContainer p_obj) => _OpenMenuInternal(p_obj as CW_MenuContainer);
     protected void _OpenMenuInternal(CW_MenuContainer? p_menuContainer)
     {
@@ -79,14 +78,14 @@ public partial class CW_MenuManager : CW_Control
     }
     
 
-    public void _CloseMenu(Tag p_menuTag)
+    public void _CloseMenu(Tag p_menuTag, bool p_bLogOnFail = false)
     {
         if (_MenuContainers.TryGetValue(p_menuTag.FullName(), out CW_MenuContainer? menuContainer) && menuContainer._IsActivated)
         {
             _Stack.Remove(menuContainer);
             menuContainer._Deactivate();
         }
-        else
+        else if (p_bLogOnFail)
             MyLogger._LogErrorCommon($"MenuManager._CloseMenu: {p_menuTag} not openned");
     }
     private void OnMenuDeactivated(CW_ActivatableContainer p_obj) => _CloseMenuInternal(p_obj as CW_MenuContainer);

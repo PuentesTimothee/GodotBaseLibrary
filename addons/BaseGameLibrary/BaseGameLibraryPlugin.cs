@@ -1,11 +1,12 @@
 #if TOOLS
-using ElementGodot.BaseGameLibrary.Datas;
-using ElementGodot.BaseGameLibrary.editor;
-using ElementGodot.BaseGameLibrary.Helpers;
+using BaseGameLibrary.Datas;
+using BaseGameLibrary.editor;
+using BaseGameLibrary.Helpers;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary;
 
 [Tool]
 public partial class BaseGameLibraryPlugin : BasePlugin
@@ -13,8 +14,10 @@ public partial class BaseGameLibraryPlugin : BasePlugin
 	public readonly string _AutoloadName_GdManager = "Instance_GameDatasManager";
 	public readonly string _AutoloadName_GameSettings = "Instance_GameSettings";
 
+	public GameDatasManager _GameDatasManager = new GameDatasManager(); 
 	public override void _EnterTree()
-	{
+	{	
+		AddChild(_GameDatasManager = new GameDatasManager());
 		AddCustomInspectorPlugin<MenuContainerInspectorPlugin>();
 	}
 

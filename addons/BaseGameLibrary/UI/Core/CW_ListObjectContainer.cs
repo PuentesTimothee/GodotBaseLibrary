@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ElementGodot.BaseGameLibrary.Helpers;
+using BaseGameLibrary.Helpers;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary.UI.Core;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.UI.Core;
 
 public interface IControlListWidget
 {
@@ -20,22 +21,11 @@ public interface IControlListObject
 [GlobalClass]
 public partial class CW_ListObjectContainer : MarginContainer
 {
-    [Export] public Container? _Container = null;
-    [Export] public PackedScene? _LineNode = null;
+    [Export, NodeNeeded] public Container? _Container = null;
+    [Export, NodeNeeded] public PackedScene? _LineNode = null;
 
     private List<IControlListWidget> _currentCreatedChild = new();
     private List<IControlListObject> _currentObjects = new();
-
-    // Warn users if the value hasn't been set.
-    public override string[] _GetConfigurationWarnings()
-    {
-        Array<string> sData = new();
-        if (_Container == null)
-            sData.Add("Must initialize property '_MenuManagerPacked'.");
-        if (_LineNode == null)
-            sData.Add("Must initialize property '_LineNode'.");
-        return sData.ToArray();
-    }
     
     public override void _ExitTree()
     {

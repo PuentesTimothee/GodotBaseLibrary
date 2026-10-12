@@ -2,7 +2,8 @@
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.Tags;
+// ReSharper disable once CheckNamespace
+namespace Tags;
 
 public enum EQueryType
 {

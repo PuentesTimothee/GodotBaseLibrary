@@ -2,10 +2,11 @@
 
 #if TOOLS
 
-using ElementGodot.BaseGameLibrary.UI.Core;
+using BaseGameLibrary.UI.Core;
 using Godot;
 
-namespace ElementGodot.BaseGameLibrary.editor;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.editor;
 
 [Tool]
 public partial class MenuContainerInspectorControl(CW_MenuContainer? p_menuContainer) : RichTextLabel
@@ -20,7 +21,7 @@ public partial class MenuContainerInspectorControl(CW_MenuContainer? p_menuConta
 	{
 		FitContent = true;
 
-		if (_MenuContainer is not null)
+		if (_MenuContainer is not null && IsInstanceValid(_MenuContainer))
 			Text = $"Current tag: [{_MenuContainer.GetTag()}]";
 	}
 	

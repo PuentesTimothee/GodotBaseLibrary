@@ -1,7 +1,8 @@
 // Copyright © Gamesmiths Guild.
 
 #if TOOLS
-namespace ElementGodot.Tags.editor;
+// ReSharper disable once CheckNamespace
+namespace Tags.editor;
 
 internal static class EditorUtils
 {

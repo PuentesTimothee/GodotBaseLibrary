@@ -8,7 +8,7 @@ Deux plugins maison, activés dans Project Settings > Plugins :
 | `GameplayTags` (`TagEditor`) | `Tags/` | Système de Gameplay Tags (comme les GameplayTags d'Unreal) + outils d'éditeur |
 
 
-Namespaces : `BaseGameLibrary.*` et `Tags`.
+Namespaces : `BaseGameLibrary.*` et `Tags[.editor]`.
 
 ---
 
@@ -83,9 +83,10 @@ Il ajoute aussi l'inspecteur de `CW_MenuContainer`. `BasePlugin` fournit `AddCus
 
 ### Gameplay/ et MainSceneBase
 
-- `GameModeBase` : `_GameModeBegin()` à surcharger, signal `OnGamemodeReady`.
-- `MainSceneBase` (`Node3D`) : point d'entrée. Crée l'`InputNode`, instancie le `CW_MenuManager` depuis `_MenuManagerPacked`, expose `MenuManager`, `InputNode`, `GetNakedMode()` et un `RandomNumberGenerator` statique.
+- `GameModeBase` : `_GameModeBegin()` à surcharger ; `_FinishedLoading()` émet le signal `OnGamemodeReady`.
+- `MainSceneBase` (`Node3D`) : point d'entrée. Crée le `BaseInputNode`, instancie le `CW_MenuManager` depuis `_MenuManagerPacked` (`[NodeNeeded]`, comme `_InternalCamera3D`), puis lance le game mode. Expose statiquement `MenuManager`, `InputNode`, `GetNakedMode()`, `RandomNumberGenerator`, `IsTestMode`, `IsPaused` ; `_SetPause(bool)` met l'arbre en pause.
   - Arguments de lancement : `--testMode`, `--seed=N`.
+  - Possède un `InputHandler` de debug (`_OnlyInTest`, priorité système).
 
 ### Settings/
 
@@ -95,16 +96,26 @@ Il ajoute aussi l'inspecteur de `CW_MenuContainer`. `BasePlugin` fournit `AddCus
 
 ### Input/
 
-- `BaseInputNode` : reçoit les événements et les transmet à un `InputHandler`. `_Register(EInputList | string, delegate)` / `_Unregister`.
-- `InputHandler` : `Resource` qui associe une action d'input à des délégués (`_UnhandledInput`).
-- `EInputList` : liste des actions du jeu.
+Les actions d'input sont identifiées par des `Tag` préfixés `input.` (`InputHandler.TAG_PREFIX`). Le tag `input.xxx` correspond à l'action `xxx` de l'`InputMap` (`InputHandler.GetFromTag`).
+
+- `BaseInputNode` : reçoit `_ShortcutInput` / `_UnhandledInput` / `_UnhandledKeyInput` et les transmet à ses `InputHandler`, triés par `_Priority`. `AddNewInputHandler` / `RemoveInputHandler` permettent de les brancher et débrancher à chaud (changement de contexte).
+- `InputHandler` : `Resource` qui associe des tags d'input à des délégués.
+  - `_Register(Tag, DInputPressed)` / `_Unregister(StringName, DInputPressed)`.
+  - `_Priority` : `PrioritySystem` (0), `PriorityUi` (100), `PriorityGameplay` (200), `PriorityNonSet` (9999, défaut).
+  - `_EnableDuringPause` : faux par défaut, le handler est ignoré en pause.
+  - `_OnlyInTest` (constructeur `InputHandler(true)`) : ignoré par `BaseInputNode` hors `--testMode`.
+  - Un handler s'arrête dès que l'événement est déjà géré par le viewport (`IsInputHandled`).
+  - Surcharges : `_ShortcutInput_Impl`, `_KeyBoardInput_Impl`, `_UnhandledInput`.
+- `PlayerInputDelegate` : événement `On_Pressed` associé à un tag d'input.
+- Côté projet, `InputDataManager` (`Scripts/Datas/`) parcourt l'`InputMap` et crée les tags `input.*` (`_` remplacé par `.`).
 
 ### Helpers/
 
 | Fichier | Contenu |
 |---|---|
-| `MyLogger` | Logs par sévérité et type. Arguments : `--log=`, `--logW=`, `--logE=` |
-| `Reflection` | `GetEnumerableOfType<T>()`, `GetEnumerableOfTypeCreated<T>()` |
+| `MyLogger` | Logs par sévérité et type. Arguments : `--log=`, `--logW=`, `--logE=`, `--logEditor=` (éditeur seulement) |
+| `NodeNeededAttribute` | `[NodeNeeded]` sur un champ / propriété : s'il est `null`, un avertissement de configuration s'affiche sur le nœud dans l'éditeur |
+| `ReflectionHelper` (`Reflection.cs`) | `GetEnumerableOfType<T>()`, `GetEnumerableOfTypeCreated<T>()`, `GetMemberOfGivenTypeAndAttribute<TType, TAttribute>()`, `_GetConfigurationWarnings<TNode, TAttribute>()` |
 | `TimCollection` | `_FindByPredicate`, `_ForEach`, `_IsEmpty` |
 | `TimEnums` | Préfixe `e_` : parsing, traduction d'enums |
 | `TimHelpers` | `FindParentOfType`, `Tr_Format`, chargement JSON, texte coloré BBCode, extensions `Tag` |
@@ -113,13 +124,13 @@ Il ajoute aussi l'inspecteur de `CW_MenuContainer`. `BasePlugin` fournit `AddCus
 
 ### UI/
 
-- `CW_Control` : `Control` de base, prévenu quand le game mode est prêt.
-- `CW_ActivatableContainer` : conteneur qui s'affiche / se masque (`_Activate`, `_Deactivate`, événements `On_Activated` / `On_Deactivated`).
-- `CW_MenuContainer` : un menu, identifié par un `Tag` (`GetTag()` à surcharger), avec `CW_Header` et `CW_Footer`.
-- `CW_MenuManager` : pile de menus. Indexe ses enfants `CW_MenuContainer` par tag ; `_OpenMenu(Tag)`.
+- `CW_Control` : `Control` abstrait de base. Prévenu quand le game mode est prêt (`_OnGameModeReady`) et affiche les avertissements `[NodeNeeded]`.
+- `CW_ActivatableContainer` : conteneur qui s'affiche / se masque (`_Activate`, `_Deactivate`, `_ToggleState`, `_SetActivated`, événements `On_Activated` / `On_Deactivated`, hooks `_OnActivate` / `_OnDeactivate`).
+- `CW_MenuContainer` : un menu, identifié par un `Tag` (`GetTag()` à surcharger), avec `CW_Header` (titre, bouton de fermeture) et `CW_Footer`. `_Closeable` autorise la fermeture.
+- `CW_MenuManager` : pile de menus. Indexe ses enfants `CW_MenuContainer` par tag (doublon = `InvalidDataException`) ; `_OpenMenu(Tag)`, `_ToggleMenu(Tag)`, `_CloseMenu(Tag)`, `_CloseAllMenu()`.
 - `CW_ListObjectContainer` : liste générique de widgets (`IControlListWidget` / `IControlListObject`).
-- `CW_InputAction`, `CW_Tooltip` : widgets d'input et d'infobulle.
-- `Settings/CW_SettingEntry`, `CW_SettingTab` : lignes et onglets du menu de settings. `CW_SettingEntry._CurrentTag` désigne le setting affiché.
+- `CW_InputAction` : widget d'input (classe vide pour l'instant). `CW_Tooltip` : infobulle.
+- `Settings/CW_SettingEntry`, `CW_SettingTab` : lignes et onglets du menu de settings. `CW_SettingEntry._CurrentTag` désigne le setting affiché ; `_Title` et `_Control` sont `[NodeNeeded]`.
 
 ### editor/
 
@@ -129,4 +140,6 @@ Il ajoute aussi l'inspecteur de `CW_MenuContainer`. `BasePlugin` fournit `AddCus
 
 ### Licence
 
-GPLv3 (`BaseGameLibrary/License.md`). Projet .NET 8 séparé : `ElementGodot.BaseGameLibrary.csproj`.
+GPLv3 (`BaseGameLibrary/License.md`). Projet .NET 8 séparé : `BaseGameLibrary.csproj`.
+
+---

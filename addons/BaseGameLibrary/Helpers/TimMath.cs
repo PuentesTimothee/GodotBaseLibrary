@@ -1,4 +1,4 @@
-﻿namespace ElementGodot.BaseGameLibrary.Helpers;
+﻿namespace BaseGameLibrary.Helpers;
 
 public record struct BaseRange<TType>(TType _Min, TType _Max)
 {

@@ -1,10 +1,11 @@
 ﻿using System.Linq;
-using ElementGodot.BaseGameLibrary.Helpers;
+using BaseGameLibrary.Helpers;
 using Godot;
 using Godot.Collections;
 using Microsoft.VisualBasic;
 
-namespace ElementGodot.Tags;
+// ReSharper disable once CheckNamespace
+namespace Tags;
 
 [Tool]
 public partial class TagNode(TagNode? p_parentNode, StringName p_keyName) : RefCounted

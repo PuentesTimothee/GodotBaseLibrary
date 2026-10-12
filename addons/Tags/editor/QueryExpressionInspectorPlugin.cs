@@ -1,10 +1,11 @@
 // Copyright © Gamesmiths Guild.
 
 #if TOOLS
-using ElementGodot.BaseGameLibrary.editor;
+using BaseGameLibrary.editor;
 using Godot;
 
-namespace ElementGodot.Tags.editor;
+// ReSharper disable once CheckNamespace
+namespace Tags.editor;
 
 [Tool]
 public partial class QueryExpressionInspectorPlugin : BaseEditorInspectorPlugin

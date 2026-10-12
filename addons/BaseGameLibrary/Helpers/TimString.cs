@@ -1,6 +1,7 @@
 ﻿using Godot;
 
-namespace ElementGodot.BaseGameLibrary.Helpers;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.Helpers;
 
 public static class TimString
 {

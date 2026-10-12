@@ -7,7 +7,8 @@ using System.Collections.Generic;
 using Godot;
 using GodotStringArray = Godot.Collections.Array<string>;
 
-namespace ElementGodot.Tags.editor;
+// ReSharper disable once CheckNamespace
+namespace Tags.editor;
 
 [Tool]
 public partial class TagContainerInspectorControl : VBoxContainer

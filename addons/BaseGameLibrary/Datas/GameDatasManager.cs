@@ -1,9 +1,10 @@
 ﻿using System;
-using ElementGodot.BaseGameLibrary.Helpers;
+using BaseGameLibrary.Helpers;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary.Datas;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.Datas;
 
 public sealed class DataSingletonException : Exception;
 
@@ -11,6 +12,7 @@ public sealed class DataSingletonException : Exception;
 /// <para>This class is used to contains different Data Library in your Game</para>
 /// <para> All the Class overriding <see cref="DataSingleton"/> are added through reflection in this Manager and opened through <see cref="GetDatas()"/> or <see cref="DataSingleton.Instance()"/> </para>
 /// </summary>
+[Tool]
 public partial class GameDatasManager : Singleton<GameDatasManager>
 {
     private Array<DataSingleton> _allManager = new();

@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-namespace ElementGodot.Tags.editor;
+// ReSharper disable once CheckNamespace
+namespace Tags.editor;
 
 public enum ESelectionMode
 {
@@ -158,7 +159,7 @@ public partial class TagTreeSelector : VBoxContainer
 		TagNode? rootNode = _restrictionTag ?? TagsManager.Instance._RootNode;
 
 		if (rootNode is null || rootNode._Childs.Count == 0)
-		{
+		{ 
 			TreeItem emptyItem = _tree.CreateItem(root);
 			emptyItem.SetText(0, "No tag has been registered yet.");
 			emptyItem.SetCustomColor(0, Color.FromHtml("EED202"));

@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using BaseGameLibrary.Helpers;
 using Godot;
 
-namespace ElementGodot.BaseGameLibrary.UI.Core;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.UI.Core;
 
 [GlobalClass] [Tool]
 public partial class CW_ActivatableContainer : PanelContainer
@@ -11,6 +16,9 @@ public partial class CW_ActivatableContainer : PanelContainer
     public event Action<CW_ActivatableContainer>? On_Activated;
     public event Action<CW_ActivatableContainer>? On_Deactivated;
 
+    public override string[] _GetConfigurationWarnings() =>
+        ReflectionHelper._GetConfigurationWarnings<Control, NodeNeededAttribute>(this);
+    
     public override void _Ready()
     {
         SetVisible(_IsActivated);

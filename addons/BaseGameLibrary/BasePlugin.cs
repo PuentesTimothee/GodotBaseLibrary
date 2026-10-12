@@ -1,9 +1,11 @@
 #if TOOLS
-using ElementGodot.BaseGameLibrary.editor;
+using BaseGameLibrary.Datas;
+using BaseGameLibrary.editor;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary;
 
 [Tool]
 public partial class BasePlugin : EditorPlugin
@@ -21,7 +23,6 @@ public partial class BasePlugin : EditorPlugin
 		where TPlugin : EditorInspectorPlugin, new()
 	{
 		TPlugin sData = new TPlugin();
-		
 		AddInspectorPlugin(sData);
 		_tagInspectorPlugins.Add(sData);
 	}

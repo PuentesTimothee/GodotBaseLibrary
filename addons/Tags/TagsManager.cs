@@ -2,13 +2,14 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using ElementGodot.BaseGameLibrary;
-using ElementGodot.BaseGameLibrary.Datas;
-using ElementGodot.BaseGameLibrary.Helpers;
+using BaseGameLibrary;
+using BaseGameLibrary.Datas;
+using BaseGameLibrary.Helpers;
 
 using Godot;
 
-namespace ElementGodot.Tags;
+// ReSharper disable once CheckNamespace
+namespace Tags;
 
 [Tool]
 public partial class TagsManager : Singleton<TagsManager>

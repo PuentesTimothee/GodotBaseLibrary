@@ -1,10 +1,11 @@
 ﻿
 using System.Linq;
-using ElementGodot.Tags;
+using Tags;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary.UI.Core;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.UI.Core;
 
 [GlobalClass, Icon("res://addons/BaseGameLibrary/editor/Ic_Menu.svg")] [Tool]
 public partial class CW_MenuContainer : CW_ActivatableContainer
@@ -22,7 +23,7 @@ public partial class CW_MenuContainer : CW_ActivatableContainer
     
     public override string[] _GetConfigurationWarnings()
     {
-        Array<string> sData = new();
+        Array<string> sData = new(base._GetConfigurationWarnings());
         if (GetTag() is null || !GetTag().IsValid())
             sData.Add("Must initialize property '_LinkedTag'.");
         return sData.ToArray();

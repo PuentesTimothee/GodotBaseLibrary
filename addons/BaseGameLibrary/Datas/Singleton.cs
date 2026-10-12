@@ -1,6 +1,7 @@
 ﻿using Godot;
 
-namespace ElementGodot.BaseGameLibrary.Datas;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.Datas;
 
 public static class SingletonHelper
 {

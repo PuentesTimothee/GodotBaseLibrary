@@ -1,8 +1,9 @@
 ﻿using System.IO;
-using ElementGodot.BaseGameLibrary.Helpers;
+using BaseGameLibrary.Helpers;
 using Godot;
 
-namespace ElementGodot.BaseGameLibrary.UI.Core;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.UI.Core;
 
 [GlobalClass, Tool]
 public partial class CW_Footer : MarginContainer

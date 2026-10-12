@@ -1,7 +1,8 @@
 ﻿using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary.Helpers;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.Helpers;
 
 
 public enum LogSeverity
@@ -15,7 +16,8 @@ public enum LogType
 {
     e_Default,
     e_Warning,
-    e_Error
+    e_Error,
+    e_Editor
 }
 
 /// <summary>
@@ -25,6 +27,7 @@ public enum LogType
 /// "--log=" -> <see cref="LogType.e_Default"/> <br/>
 /// "--logW=" -> <see cref="LogType.e_Warning"/> <br/>
 /// "--logE=" -> <see cref="LogType.e_Error"/> <br/>
+/// "--logEditor=" -> <see cref="LogType.e_Editor"/> (printed only inside the Godot editor) <br/>
 /// </para>
 /// <para> Possible values: <br/>
 /// Default -> <see cref="LogSeverity.e_Default"/> <br/>
@@ -44,13 +47,14 @@ public sealed class MyLogger
         sValueString.Add("--log=", LogType.e_Default);
         sValueString.Add("--logW=", LogType.e_Warning);
         sValueString.Add("--logE=", LogType.e_Error);
+        sValueString.Add("--logEditor=", LogType.e_Editor);
 
         foreach (string arg in args)
         {
             foreach (var (str, val) in sValueString)
             {
                 if (arg.StartsWith(str))
-                    if (TimEnums.TryParseWithPrefix(arg.Substring(str.Length + 1), out LogSeverity logType))
+                    if (TimEnums.TryParseWithPrefix(arg.Substring(str.Length), out LogSeverity logType))
                         MyLogger._SetSeverityFor(val, logType);
             }
         }
@@ -75,6 +79,9 @@ public sealed class MyLogger
     public static void _LogWarning(LogSeverity p_severity, string p_message) => MyLogger._Log(p_severity, LogType.e_Warning, p_message);
 
     /// <inheritdoc cref="MyLogger"/>
+    public static void _LogEditor(LogSeverity p_severity, string p_message) => MyLogger._Log(p_severity, LogType.e_Editor, p_message);
+
+    /// <inheritdoc cref="MyLogger"/>
     public static void _LogTextCommon(string p_message) => MyLogger._LogText(LogSeverity.e_Default, p_message);
 
     /// <inheritdoc cref="MyLogger"/>
@@ -94,6 +101,10 @@ public sealed class MyLogger
                     return;
                 case LogType.e_Error:
                     GD.PushError(p_message);
+                    return;
+                case LogType.e_Editor:
+                    if (Engine.IsEditorHint())
+                        GD.Print($"[Editor] {p_message}");
                     return;
             }
     }

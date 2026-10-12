@@ -1,12 +1,13 @@
-﻿using ElementGodot.BaseGameLibrary.Settings;
-using ElementGodot.BaseGameLibrary.UI.Core;
+﻿using BaseGameLibrary.Settings;
+using BaseGameLibrary.UI.Core;
 using Godot;
 using Godot.Collections;
-using Tag = ElementGodot.Tags.Tag;
+using Tags;
 
-namespace ElementGodot.Scripts.UI.Settings;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.UI.Settings;
 
-[GlobalClass]
+[GlobalClass, Tool]
 public partial class CW_SettingTab : CW_ActivatableContainer
 {
     [Export] public Array<Tag> _AllLine = new();

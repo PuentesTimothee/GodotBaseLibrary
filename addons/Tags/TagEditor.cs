@@ -1,10 +1,11 @@
 #if TOOLS
-using ElementGodot.BaseGameLibrary;
-using ElementGodot.BaseGameLibrary.editor;
-using ElementGodot.Tags.editor;
+using BaseGameLibrary;
+using BaseGameLibrary.editor;
+using Tags.editor;
 using Godot;
 
-namespace ElementGodot.Tags;
+// ReSharper disable once CheckNamespace
+namespace Tags;
 
 [Tool]
 public partial class TagEditor : BasePlugin
@@ -17,7 +18,13 @@ public partial class TagEditor : BasePlugin
 	private TagInspectorPlugin? _tagInspectorPlugin;
 
 	private EditorFileSystem? _fileSystem;
+	private TagsManager _tagManager;
 
+	public TagEditor()
+	{
+		AddChild(_tagManager = new TagsManager());
+	}
+	
 	public override void _EnablePlugin()
 	{
 		AddAutoloadSingleton(_AutoloadName_Tags, "res://addons/Tags/TagsManager.cs");
@@ -52,6 +59,8 @@ public partial class TagEditor : BasePlugin
 		_fileSystem = null;
 
 		RemoveToolMenuItem("Repair assets tags");
+
+		base._ExitTree();
 	}
 
 

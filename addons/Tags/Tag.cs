@@ -1,10 +1,11 @@
 using System;
 using System.IO;
-using ElementGodot.BaseGameLibrary.Datas;
-using ElementGodot.BaseGameLibrary.Helpers;
+using BaseGameLibrary.Datas;
+using BaseGameLibrary.Helpers;
 using Godot;
 
-namespace ElementGodot.Tags;
+// ReSharper disable once CheckNamespace
+namespace Tags;
 
 public enum ETagFetch
 {

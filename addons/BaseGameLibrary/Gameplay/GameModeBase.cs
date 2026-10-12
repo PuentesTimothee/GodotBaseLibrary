@@ -1,6 +1,7 @@
 using Godot;
 
-namespace ElementGodot.BaseGameLibrary.Gameplay;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.Gameplay;
 
 /// <summary>
 /// <para> Basic Building block for your game. Used to Compartmentalize the Game logics</para>

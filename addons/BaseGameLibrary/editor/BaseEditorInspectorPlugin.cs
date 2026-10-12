@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-
+using BaseGameLibrary.Helpers;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary.editor;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.editor;
 
 #if TOOLS
 [Tool]
@@ -13,8 +14,10 @@ public partial class BaseEditorInspectorPlugin : EditorInspectorPlugin
 {
     public bool _CanHandleIfContains(GodotObject p_object, HashSet<Type> p_TypeToCheck)
     {
-        if (DEBUG_LOGS)
-            GD.Print($"[TestBoxInspectorPlugin] _CanHandle called for object with ID {p_object} / {p_object.GetScript()}");
+        if (p_object is null)
+            return false;
+        
+        MyLogger._LogEditor(LogSeverity.e_Verbose, $"[{GetType().Name}] _CanHandle called for object with ID {p_object} / {p_object.GetScript()}");
 		
         Type type = p_object.GetType();
         PropertyInfo[] sProperties =
@@ -24,8 +27,7 @@ public partial class BaseEditorInspectorPlugin : EditorInspectorPlugin
         {
             if (p_TypeToCheck.Contains(property.PropertyType))
             {
-                if (DEBUG_LOGS)
-                    GD.Print($"[{GetType()}] Found {property.PropertyType} properties: {property.Name}");
+                MyLogger._LogEditor(LogSeverity.e_Verbose, $"[{GetType().Name}] Found {property.PropertyType.Name} properties: {property.Name}");
                 return true;
             }
         }
@@ -35,8 +37,7 @@ public partial class BaseEditorInspectorPlugin : EditorInspectorPlugin
         {
             if (p_TypeToCheck.Contains(field.FieldType))
             {
-                if (DEBUG_LOGS)
-                    GD.Print($"[{GetType()}] Found {field.FieldType} field: {field.Name}");
+                MyLogger._LogEditor(LogSeverity.e_Verbose, $"[{GetType().Name}] Found {field.FieldType.Name} field: {field.Name}");
                 return true;
             }
         }
@@ -77,7 +78,5 @@ public partial class BaseEditorInspectorPlugin : EditorInspectorPlugin
 
         return false;
     }
-
-    private const bool DEBUG_LOGS = true;
 }
 #endif

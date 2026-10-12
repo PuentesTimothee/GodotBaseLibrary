@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.Tags;
+// ReSharper disable once CheckNamespace
+namespace Tags;
 
 [GlobalClass, Tool]
 public partial class TagContainer : Resource, IEnumerable<Tag>

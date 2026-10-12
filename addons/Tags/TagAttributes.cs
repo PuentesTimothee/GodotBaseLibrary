@@ -1,7 +1,8 @@
 ﻿using System;
 using Godot;
 
-namespace ElementGodot.Tags;
+// ReSharper disable once CheckNamespace
+namespace Tags;
 
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
 public class TagAttribute(string p_restrictionTag) : Attribute

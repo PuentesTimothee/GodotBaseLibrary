@@ -4,10 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using ElementGodot.BaseGameLibrary.editor;
+using BaseGameLibrary.editor;
 using Godot;
 
-namespace ElementGodot.Tags.editor;
+// ReSharper disable once CheckNamespace
+namespace Tags.editor;
 
 [Tool]
 public partial class TagInspectorPlugin : BaseEditorInspectorPlugin
@@ -21,29 +22,20 @@ public partial class TagInspectorPlugin : BaseEditorInspectorPlugin
 		PropertyHint p_hintType, string p_hintString)
 	{
 
-		Type type = p_object.GetType();
-		PropertyInfo? sProperty = type.GetProperty(p_name);
-		FieldInfo? sField = type.GetField(p_name);
-		StringName? restrictionString = null;
+		StringName? restrictionString;
+		if (p_memberInfo is not null && p_memberInfo.GetCustomAttribute<TagAttribute>() is { } sCustom)
+			restrictionString = sCustom._Restriction;
+		else
+			restrictionString = new StringName();
 
 		if (p_memberType == typeof(Tag))
 		{
-			if (p_memberInfo is not null && p_memberInfo.GetCustomAttribute<TagAttribute>() is { } sCustom)
-				restrictionString = sCustom._Restriction;
-			else
-				restrictionString = new StringName();
-
 			AddPropertyEditor(p_name, new TagEditorProperty(restrictionString));
 			return true;
 		}
 		
 		if (p_memberType == typeof(TagContainer))
 		{
-			if (p_memberInfo is not null && p_memberInfo.GetCustomAttribute<TagAttribute>() is { } sCustom)
-				restrictionString = sCustom._Restriction;
-			else
-				restrictionString = new StringName();
-
 			AddPropertyEditor(p_name, new TagContainerEditorProperty(restrictionString));
 			return true;
 		}

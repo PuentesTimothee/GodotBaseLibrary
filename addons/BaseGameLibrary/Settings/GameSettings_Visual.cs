@@ -2,7 +2,8 @@
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary.Settings;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.Settings;
 
 public partial class GameSingleSettings_Locale : GameSingleSetting_Dropdown
 {

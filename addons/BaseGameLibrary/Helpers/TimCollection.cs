@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary.Helpers;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.Helpers;
 
 public static class TimExtensions_Collections
 {

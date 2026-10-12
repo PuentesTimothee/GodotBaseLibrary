@@ -1,9 +1,10 @@
 ﻿using System.Linq;
-using ElementGodot.BaseGameLibrary.Helpers;
+using BaseGameLibrary.Helpers;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.Scripts.UI.Tooltip;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.UI.Tooltip;
 
 public partial class CW_Tooltip : PanelContainer
 {

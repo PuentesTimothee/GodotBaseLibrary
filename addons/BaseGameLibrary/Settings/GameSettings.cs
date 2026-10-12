@@ -1,10 +1,11 @@
-﻿using ElementGodot.BaseGameLibrary.Datas;
-using ElementGodot.BaseGameLibrary.Helpers;
-using ElementGodot.Tags;
+﻿using BaseGameLibrary.Datas;
+using BaseGameLibrary.Helpers;
+using Tags;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary.Settings;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.Settings;
 
 public enum ESettingsSection
 {

@@ -5,13 +5,18 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-namespace ElementGodot.Tags.editor;
+// ReSharper disable once CheckNamespace
+namespace Tags.editor;
 
 [Tool]
 public partial class TagEditorProperty : EditorProperty, ISerializationListener
 {
 	private TagTreeSelector? _selector;
 	private readonly StringName? _restrictionString;
+
+	public TagEditorProperty()
+	{
+	}
 
 	public TagEditorProperty(StringName? p_restrictionString) => _restrictionString = p_restrictionString;
 

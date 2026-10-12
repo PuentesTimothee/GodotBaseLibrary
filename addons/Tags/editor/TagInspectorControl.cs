@@ -7,7 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-namespace ElementGodot.Tags.editor;
+// ReSharper disable once CheckNamespace
+namespace Tags.editor;
 
 [Tool]
 public partial class TagInspectorControl : VBoxContainer

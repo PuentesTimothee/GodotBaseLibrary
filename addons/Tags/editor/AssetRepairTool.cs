@@ -4,18 +4,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ElementGodot.BaseGameLibrary.Helpers;
+using BaseGameLibrary.Helpers;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.Tags.editor;
+// ReSharper disable once CheckNamespace
+namespace Tags.editor;
 
 [Tool]
 public partial class AssetRepairTool : EditorPlugin
 {
 	public static void RepairAllAssetsTags()
 	{
-		var tagsManager = ElementGodot.Tags.TagsManager.Instance;
+		var tagsManager = Tags.TagsManager.Instance;
 
 		List<string> scenes = AssetRepairTool.GetScenePaths("res://");
 		GD.Print($"Found {scenes.Count} scene(s) to process.");
@@ -118,7 +119,7 @@ public partial class AssetRepairTool : EditorPlugin
 	/// <param name="p_node">Current node iteration.</param>
 	/// <param name="p_tagsManager">The tags manager used to validate tags.</param>
 	/// <returns><see langword="true"/> if any ForgeEntity was modified.</returns>
-	private static bool ProcessNode(Node p_node, ElementGodot.Tags.TagsManager p_tagsManager)
+	private static bool ProcessNode(Node p_node, Tags.TagsManager p_tagsManager)
 	{
 		bool modified = AssetRepairTool.ValidateNode(p_node, p_tagsManager);
 
@@ -130,7 +131,7 @@ public partial class AssetRepairTool : EditorPlugin
 		return modified;
 	}
 
-	private static bool ValidateNode(Node p_node, ElementGodot.Tags.TagsManager p_tagsManager)
+	private static bool ValidateNode(Node p_node, Tags.TagsManager p_tagsManager)
 	{
 		bool modified = false;
 		foreach (Dictionary propertyInfo in p_node.GetPropertyList())

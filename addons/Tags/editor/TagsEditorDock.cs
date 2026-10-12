@@ -7,7 +7,8 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Godot;
 
-namespace ElementGodot.Tags.editor;
+// ReSharper disable once CheckNamespace
+namespace Tags.editor;
 
 /// <summary>
 /// Editor dock for managing gameplay tags.
@@ -67,7 +68,7 @@ public partial class TagsEditorDock : EditorDock, ISerializationListener
 		if (_addTagButton is not null)
 			_addTagButton.Pressed += AddTagButton_Pressed;
 
-		_tagsManager = ElementGodot.Tags.TagsManager.Instance;
+		_tagsManager = Tags.TagsManager.Instance;
 		ReconstructTreeNode();
 	}
 

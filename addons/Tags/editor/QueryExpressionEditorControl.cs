@@ -5,7 +5,8 @@ using System;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.Tags.editor;
+// ReSharper disable once CheckNamespace
+namespace Tags.editor;
 
 [Tool]
 public partial class QueryExpressionEditorControl : VBoxContainer

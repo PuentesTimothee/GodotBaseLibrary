@@ -2,10 +2,11 @@
 
 #if TOOLS
 using System;
-using ElementGodot.BaseGameLibrary.UI.Core;
+using BaseGameLibrary.UI.Core;
 using Godot;
 
-namespace ElementGodot.BaseGameLibrary.editor;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.editor;
 
 public partial class MenuContainerInspectorPlugin : BaseEditorInspectorPlugin
 {

@@ -1,9 +1,10 @@
 ﻿using System;
-using ElementGodot.BaseGameLibrary.Helpers;
+using BaseGameLibrary.Helpers;
 using Godot;
 using Godot.Collections;
 
-namespace ElementGodot.BaseGameLibrary.Settings;
+// ReSharper disable once CheckNamespace
+namespace BaseGameLibrary.Settings;
 
     
 
